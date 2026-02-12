@@ -1,0 +1,270 @@
+.cats {
+
+  padding: 34px 28px 44px;
+
+  background: #0f0f10;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.cats__top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: start;
+
+ 
+  margin: 0 auto 18px;
+}
+
+.cats__head {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  align-items: start;
+}
+
+.cats__title {
+  align-self: start;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.cats__sub {
+    
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+  max-width: 760px;
+}
+
+/* ---------- NAV (ARROWS + DOTS) ---------- */
+
+.cats__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 12px;
+  border-radius: 12px;
+
+  background: rgba(22, 22, 22, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.cats__navBtn {
+  appearance: none;
+  border: 0;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+
+  display: grid;
+  place-items: center;
+
+  transition: background 160ms ease, transform 160ms ease, color 160ms ease;
+}
+
+.cats__navBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cats__navBtn:active {
+  transform: translateY(1px);
+}
+
+.cats__navBtn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.22);
+  outline-offset: 2px;
+}
+
+.cats__navIcon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.cats__navIcon--right {
+  transform: rotate(180deg);
+}
+
+.cats__navDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.cats__dot {
+  width: 18px;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.cats__dot.is-active {
+  background: #e50914;
+}
+
+/* ---------- LAYOUTS ---------- */
+
+.cats__row {
+  max-width: 1180px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-auto-flow: column;
+  
+  gap: 18px;
+
+  overflow-x: auto;
+  padding: 6px 2px 10px;
+
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.cats__row::-webkit-scrollbar {
+  display: none;
+}
+
+.cats__grid {
+  max-width: 1180px;
+  margin: 0 auto;
+
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* ---------- CATEGORY CARD ---------- */
+
+.catCard {
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.catCard__btn {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.catCard__thumb {
+  position: relative;
+  width: 100%;
+  height: 168px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.catCard__thumb.is-single .catCard__imgSingle {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transform: scale(1.02);
+}
+
+.catCard__imgGrid {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.catCard__imgGrid img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.catCard__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 80% at 50% 35%, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.65)),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.55));
+}
+
+.catCard__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 14px 14px;
+}
+
+.catCard__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.catCard__arrow {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1px);
+}
+
+.catCard__btn:hover .catCard__arrow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.catCard__btn:hover .catCard__thumb {
+  filter: brightness(1.03);
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 820px) {
+  .cats {
+    padding: 26px 18px 34px;
+  }
+
+  .cats__top {
+    grid-template-columns: 1fr;
+  }
+
+  .cats__nav {
+    justify-self: start;
+  }
+
+  .cats__row {
+    grid-auto-columns: 210px;
+  }
+}
+
+@media (max-width: 520px) {
+  .cats__title {
+    font-size: 18px;
+  }
+
+  .cats__sub {
+    font-size: 12px;
+  }
+
+  .catCard__thumb {
+    height: 155px;
+  }
+}

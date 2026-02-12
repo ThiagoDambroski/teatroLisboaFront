@@ -1,0 +1,143 @@
+.catalogIntro {
+  width: 100%;
+  padding: 40px 0;
+  background: #0f0f10;
+}
+
+.catalogIntro__card {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+}
+
+.catalogIntro__image {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+  display: block;
+}
+
+.catalogIntro__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.2)),
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7));
+}
+
+.catalogIntro__content {
+  position: absolute;
+  left: 50%;
+  bottom: 80px;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 100%;
+  max-width: 760px;
+  padding: 0 24px;
+  color: #fff;
+}
+
+.catalogIntro__content h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.catalogIntro__content p {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.catalogIntro__cta {
+  margin-top: 18px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  border: none;
+  background: #e50914;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.catalogIntro__cta:hover {
+  transform: translateY(-2px);
+  background: #ff1f2e;
+}
+
+.catalogIntro__nav {
+  position: absolute;
+  bottom: 30px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.catalogIntro__nav svg {
+  width: 20px;
+  height: 20px;
+}
+
+.catalogIntro__nav:hover {
+  background: rgba(0, 0, 0, 0.65);
+  transform: translateY(-2px);
+}
+
+.catalogIntro__nav--left {
+  left: 30px;
+}
+
+.catalogIntro__nav--right {
+  right: 30px;
+}
+
+.catalogIntro__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 38px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.catalogIntro__dot {
+  width: 20px;
+  height: 4px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.catalogIntro__dot.active {
+  background: #e50914;
+}
+
+@media (max-width: 768px) {
+  .catalogIntro__image {
+    height: 400px;
+  }
+
+  .catalogIntro__content {
+    bottom: 60px;
+  }
+
+  .catalogIntro__content h2 {
+    font-size: 22px;
+  }
+
+  .catalogIntro__content p {
+    font-size: 13px;
+  }
+}
