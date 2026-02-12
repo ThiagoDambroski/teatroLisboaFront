@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { useApp } from "../Context/AppProvider"; 
+import { useNavigate } from "react-router-dom";
+import { useApp } from "../Context/AppProvider";
 import "../scss/HomePrices.css";
 
 type PriceGroup = {
@@ -17,6 +18,7 @@ function formatEUR(value: number): string {
 
 export default function HomePrices() {
   const { categories } = useApp();
+  const navigate = useNavigate();
 
   const priceGroups = useMemo<PriceGroup[]>(() => {
     const movies = categories.flatMap((c) => c.movies);
@@ -31,7 +33,14 @@ export default function HomePrices() {
       .sort((a, b) => a.price - b.price);
   }, [categories]);
 
-  const totalMovies = useMemo(() => categories.reduce((acc, c) => acc + c.movies.length, 0), [categories]);
+  const totalMovies = useMemo(
+    () => categories.reduce((acc, c) => acc + c.movies.length, 0),
+    [categories]
+  );
+
+  const goToPrice = (price: number): void => {
+    navigate(`/movies?price=${encodeURIComponent(String(price))}`);
+  };
 
   return (
     <section className="prices" aria-label="Preços">
@@ -40,8 +49,8 @@ export default function HomePrices() {
           <div>
             <h2 className="prices__title">Nossos preços</h2>
             <p className="prices__sub">
-              Os preços abaixo são gerados automaticamente com base nos valores definidos para cada filme.
-              Atualmente, há {totalMovies} filmes na plataforma.
+              Os preços abaixo são gerados automaticamente com base nos valores definidos para cada peça.
+              Atualmente, há {totalMovies} peças na plataforma.
             </p>
           </div>
         </div>
@@ -52,16 +61,21 @@ export default function HomePrices() {
               <div className="priceCard__head">
                 <h3 className="priceCard__name">Peças de {formatEUR(g.price)}</h3>
                 <div className="priceCard__meta">
-                  <span>{g.count} {g.count === 1 ? "filme" : "filmes"}</span>
+                  <span>{g.count} {g.count === 1 ? "peça" : "peças"}</span>
                 </div>
               </div>
 
               <div className="priceCard__priceRow">
                 <div className="priceCard__price">{formatEUR(g.price)}</div>
-                <div className="priceCard__unit">por filme</div>
+                <div className="priceCard__unit">por peça</div>
               </div>
 
-              <button type="button" className="priceCard__btn">
+              <button
+                type="button"
+                className="priceCard__btn"
+                onClick={() => goToPrice(g.price)}
+                aria-label={`Ver peças de ${formatEUR(g.price)}`}
+              >
                 Escolher
               </button>
             </article>

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useApp, type Movie } from "../Context/AppProvider"; // adjust path if needed
+import { useNavigate } from "react-router-dom";
+import { useApp, type Movie } from "../Context/AppProvider";
 import "../scss/CatalogyIntro.css";
 
 function formatText(text: string, max: number): string {
@@ -9,6 +10,7 @@ function formatText(text: string, max: number): string {
 
 function CatalogyIntro() {
   const { categories } = useApp();
+  const navigate = useNavigate();
 
   const movies = useMemo<Movie[]>(() => {
     return categories.flatMap((c) => c.movies);
@@ -35,11 +37,7 @@ function CatalogyIntro() {
   return (
     <section className="catalogIntro">
       <div className="catalogIntro__card">
-        <img
-          src={current.posterUrl}
-          alt={current.title}
-          className="catalogIntro__image"
-        />
+        <img src={current.posterUrl} alt={current.title} className="catalogIntro__image" />
 
         <div className="catalogIntro__overlay" />
 
@@ -47,7 +45,11 @@ function CatalogyIntro() {
           <h2>{current.title}</h2>
           <p>{formatText(current.description, 180)}</p>
 
-          <button className="catalogIntro__cta">
+          <button
+            type="button"
+            className="catalogIntro__cta"
+            onClick={() => navigate(`/movies/${current.id}`)}
+          >
             Ver agora
           </button>
         </div>
@@ -55,6 +57,7 @@ function CatalogyIntro() {
         {featured.length > 1 && (
           <>
             <button
+              type="button"
               className="catalogIntro__nav catalogIntro__nav--left"
               onClick={goPrev}
               aria-label="Anterior"
@@ -71,6 +74,7 @@ function CatalogyIntro() {
             </button>
 
             <button
+              type="button"
               className="catalogIntro__nav catalogIntro__nav--right"
               onClick={goNext}
               aria-label="Seguinte"
@@ -88,12 +92,7 @@ function CatalogyIntro() {
 
             <div className="catalogIntro__dots">
               {featured.map((_, i) => (
-                <span
-                  key={i}
-                  className={`catalogIntro__dot ${
-                    i === index ? "active" : ""
-                  }`}
-                />
+                <span key={i} className={`catalogIntro__dot ${i === index ? "active" : ""}`} />
               ))}
             </div>
           </>

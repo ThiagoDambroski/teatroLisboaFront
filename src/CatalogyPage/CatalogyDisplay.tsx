@@ -1,4 +1,5 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApp, type Category, type Movie } from "../Context/AppProvider";
 import "../scss/CatelogyDisplay.css";
 
@@ -25,6 +26,14 @@ function audienceFromAgeRating(ageRating: string): string {
   if (v === "M/16") return "Jovens adultos";
   if (v === "M/18") return "Adultos";
   return "Geral";
+}
+
+function formatEUR(value: number): string {
+  return new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 function useCanScroll(ref: React.RefObject<HTMLDivElement | null>) {
@@ -63,12 +72,45 @@ function scrollByCard(ref: React.RefObject<HTMLDivElement | null>, dir: -1 | 1):
   el.scrollBy({ left: dir * amount, behavior: "smooth" });
 }
 
-function CatalogyDisplay() {
+export default function CatalogyDisplay() {
   const { categories } = useApp();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [filter, setFilter] = useState<FilterKey>("categories");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
 
-  const allMovies = useMemo<Movie[]>(() => categories.flatMap((c) => c.movies), [categories]);
+  const allMovies = useMemo<Movie[]>(
+    () => categories.flatMap((c) => c.movies),
+    [categories]
+  );
+
+  // ✅ read params on entry (cat + price)
+  useEffect(() => {
+    const cat = searchParams.get("cat");
+    const priceRaw = searchParams.get("price");
+
+    // category
+    if (cat && categories.some((c) => c.id === cat)) {
+      setSelectedCategoryId(cat);
+      setFilter("categories");
+    } else if (!cat) {
+      setSelectedCategoryId(null);
+    }
+
+    // price
+    if (priceRaw) {
+      const parsed = Number(priceRaw);
+      if (Number.isFinite(parsed)) {
+        setSelectedPrice(parsed);
+      } else {
+        setSelectedPrice(null);
+      }
+    } else {
+      setSelectedPrice(null);
+    }
+  }, [categories, searchParams]);
 
   const recentlyAdded = useMemo<Movie[]>(() => {
     return [...allMovies].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
@@ -88,6 +130,40 @@ function CatalogyDisplay() {
     return categories.find((c) => c.id === selectedCategoryId);
   }, [categories, selectedCategoryId]);
 
+  // ✅ category movies + optional price filter
+  const categoryMoviesFiltered = useMemo<Movie[]>(() => {
+    const base = selectedCategory?.movies ?? [];
+    if (selectedPrice == null) return base;
+    return base.filter((m) => m.price === selectedPrice);
+  }, [selectedCategory, selectedPrice]);
+
+  // ✅ price mode across the whole catalog (when NO category is selected)
+  const priceMovies = useMemo<Movie[]>(() => {
+    if (selectedPrice == null) return [];
+    return allMovies.filter((m) => m.price === selectedPrice);
+  }, [allMovies, selectedPrice]);
+
+  const clearCategory = (): void => {
+    setSelectedCategoryId(null);
+    const next = new URLSearchParams(searchParams);
+    next.delete("cat");
+    setSearchParams(next, { replace: true });
+  };
+
+  const clearPrice = (): void => {
+    setSelectedPrice(null);
+    const next = new URLSearchParams(searchParams);
+    next.delete("price");
+    setSearchParams(next, { replace: true });
+  };
+
+  const selectCategory = (categoryId: string): void => {
+    setSelectedCategoryId(categoryId);
+    const next = new URLSearchParams(searchParams);
+    next.set("cat", categoryId);
+    setSearchParams(next, { replace: true });
+  };
+
   return (
     <section className="catalogyDisplay" id="movies" aria-label="Catálogo">
       <div className="catalogyDisplay__inner">
@@ -101,7 +177,56 @@ function CatalogyDisplay() {
               </p>
             </div>
 
-            {!selectedCategoryId && (
+            {/* ✅ If a category is selected, show category header */}
+            {selectedCategoryId && (
+              <div className="catalogyDisplay__filters" aria-label="Categoria selecionada">
+                <button type="button" className="catalogyDisplay__filterBtn is-active" onClick={clearCategory}>
+                  ← Voltar
+                </button>
+
+                <div className="catalogyDisplay__selectedTitle" title={selectedCategory?.name ?? ""}>
+                  {selectedCategory?.name ?? ""}
+                </div>
+
+                <div className="catalogyDisplay__selectedSub">
+                  {selectedCategory
+                    ? `${categoryMoviesFiltered.length} peça${categoryMoviesFiltered.length === 1 ? "" : "s"}`
+                    : ""}
+                </div>
+
+                {/* optional: if price also selected, allow clearing only price */}
+                {selectedPrice != null && (
+                  <button
+                    type="button"
+                    className="catalogyDisplay__filterBtn"
+                    onClick={clearPrice}
+                    aria-label="Limpar filtro de preço"
+                  >
+                    Remover preço {formatEUR(selectedPrice)}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* ✅ If NO category selected and a price is selected, show price header */}
+            {!selectedCategoryId && selectedPrice != null && (
+              <div className="catalogyDisplay__filters" aria-label="Preço selecionado">
+                <button type="button" className="catalogyDisplay__filterBtn is-active" onClick={clearPrice}>
+                  ← Voltar
+                </button>
+
+                <div className="catalogyDisplay__selectedTitle" title={`Peças de ${formatEUR(selectedPrice)}`}>
+                  Peças de {formatEUR(selectedPrice)}
+                </div>
+
+                <div className="catalogyDisplay__selectedSub">
+                  {priceMovies.length} peça{priceMovies.length === 1 ? "" : "s"}
+                </div>
+              </div>
+            )}
+
+            {/* ✅ Normal filters only when nothing is selected (no category and no price) */}
+            {!selectedCategoryId && selectedPrice == null && (
               <div className="catalogyDisplay__filters" role="tablist" aria-label="Filtros do catálogo">
                 <button
                   type="button"
@@ -134,42 +259,28 @@ function CatalogyDisplay() {
                 </button>
               </div>
             )}
-
-            {selectedCategoryId && (
-              <div className="catalogyDisplay__filters" aria-label="Categoria selecionada">
-                <button
-                  type="button"
-                  className="catalogyDisplay__filterBtn is-active"
-                  onClick={() => setSelectedCategoryId(null)}
-                >
-                  ← Voltar
-                </button>
-
-                <div className="catalogyDisplay__selectedTitle" title={selectedCategory?.name ?? ""}>
-                  {selectedCategory?.name ?? ""}
-                </div>
-
-                <div className="catalogyDisplay__selectedSub">
-                  {selectedCategory ? `${selectedCategory.movies.length} peças` : ""}
-                </div>
-              </div>
-            )}
           </div>
 
           <div className="catalogyDisplay__content">
+            {/* ✅ CATEGORY view (with optional price filter) */}
             {selectedCategoryId ? (
               <MoviesRow
                 title={selectedCategory?.name ?? "Categoria"}
-                movies={selectedCategory?.movies ?? []}
+                movies={categoryMoviesFiltered}
+                onOpenMovie={(id) => navigate(`/movies/${id}`)}
+              />
+            ) : selectedPrice != null ? (
+              /* ✅ PRICE view */
+              <MoviesRow
+                title={`Peças de ${formatEUR(selectedPrice)}`}
+                movies={priceMovies}
+                onOpenMovie={(id) => navigate(`/movies/${id}`)}
               />
             ) : (
+              /* ✅ default filtered views */
               <>
                 {filter === "categories" && (
-                  <CategoriesRow
-                    title="Categorias"
-                    categories={categories}
-                    onSelectCategory={(id) => setSelectedCategoryId(id)}
-                  />
+                  <CategoriesRow title="Categorias" categories={categories} onSelectCategory={selectCategory} />
                 )}
 
                 {filter === "recent" && (
@@ -177,6 +288,7 @@ function CatalogyDisplay() {
                     title="Adicionados recentemente"
                     movies={recentlyAdded}
                     tag="Recente"
+                    onOpenMovie={(id) => navigate(`/movies/${id}`)}
                   />
                 )}
 
@@ -185,6 +297,7 @@ function CatalogyDisplay() {
                     title="Destaques"
                     movies={featured}
                     tag="Destaque"
+                    onOpenMovie={(id) => navigate(`/movies/${id}`)}
                   />
                 )}
               </>
@@ -268,7 +381,17 @@ function CategoriesRow({
   );
 }
 
-function MoviesRow({ title, movies, tag }: { title: string; movies: Movie[]; tag?: string }) {
+function MoviesRow({
+  title,
+  movies,
+  tag,
+  onOpenMovie,
+}: {
+  title: string;
+  movies: Movie[];
+  tag?: string;
+  onOpenMovie: (movieId: string) => void;
+}) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const { canLeft, canRight } = useCanScroll(trackRef);
 
@@ -305,7 +428,13 @@ function MoviesRow({ title, movies, tag }: { title: string; movies: Movie[]; tag
 
       <div className="catalogTrack catalogTrack--posters" ref={trackRef}>
         {sliced.map((m) => (
-          <article key={m.id} className="posterCard">
+          <button
+            key={m.id}
+            type="button"
+            className="posterCard posterCard--btn"
+            onClick={() => onOpenMovie(m.id)}
+            aria-label={`Abrir ${m.title}`}
+          >
             <div className="posterCard__img">
               <img src={m.posterUrl} alt={m.title} loading="lazy" />
               {tag ? <span className="posterCard__tag">{tag}</span> : null}
@@ -322,11 +451,9 @@ function MoviesRow({ title, movies, tag }: { title: string; movies: Movie[]; tag
                 <span className="posterCard__pill">{audienceFromAgeRating(m.ageRating)}</span>
               </div>
             </div>
-          </article>
+          </button>
         ))}
       </div>
     </div>
   );
 }
-
-export default CatalogyDisplay;

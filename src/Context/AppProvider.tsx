@@ -3,6 +3,14 @@ import React, { createContext, useContext, useMemo, useState, type ReactNode } f
 export type AgeRating = "L" | "M/12" | "M/16" | "M/18";
 export type MoviePrice = 10 | 20 | 30 | 40;
 
+export type Collaborator = {
+  id: string;
+  name: string;
+  photoUrl: string;
+  functionOnMovie: string;
+  socialUrl: string;
+};
+
 export type Movie = {
   id: string;
   title: string;
@@ -15,6 +23,7 @@ export type Movie = {
   price: MoviePrice;
   createdAt: string;
   isFeatured?: boolean;
+  collaborators: Collaborator[];
 };
 
 export type Category = {
@@ -52,6 +61,75 @@ const MOCK_POSTERS: string[] = [
   "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=900&auto=format&fit=crop&q=60",
 ];
 
+const MOCK_PEOPLE: string[] = [
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=600&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=600&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=600&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1548142813-c348350df52b?w=600&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=600&auto=format&fit=crop&q=60",
+];
+
+const MOCK_SOCIALS: string[] = [
+  "https://instagram.com/teatrolisboa",
+  "https://www.linkedin.com/company/teatro-lisboa",
+  "https://x.com/teatrolisboa",
+  "https://www.behance.net",
+  "https://vimeo.com",
+];
+
+function makeCollaborator(params: {
+  id: string;
+  name: string;
+  photoIndex: number;
+  functionOnMovie: string;
+  socialIndex: number;
+}): Collaborator {
+  return {
+    id: params.id,
+    name: params.name,
+    photoUrl: MOCK_PEOPLE[params.photoIndex % MOCK_PEOPLE.length],
+    functionOnMovie: params.functionOnMovie,
+    socialUrl: MOCK_SOCIALS[params.socialIndex % MOCK_SOCIALS.length],
+  };
+}
+
+function makeCollaboratorsForMovie(seed: number): Collaborator[] {
+  const base = seed * 7;
+  return [
+    makeCollaborator({
+      id: `c-${seed}-01`,
+      name: "Inês Ribeiro",
+      photoIndex: base + 0,
+      functionOnMovie: "Direção",
+      socialIndex: base + 0,
+    }),
+    makeCollaborator({
+      id: `c-${seed}-02`,
+      name: "Tomás Almeida",
+      photoIndex: base + 1,
+      functionOnMovie: "Interpretação",
+      socialIndex: base + 1,
+    }),
+    makeCollaborator({
+      id: `c-${seed}-03`,
+      name: "Marta Correia",
+      photoIndex: base + 2,
+      functionOnMovie: "Cenografia",
+      socialIndex: base + 2,
+    }),
+    makeCollaborator({
+      id: `c-${seed}-04`,
+      name: "Bruno Santos",
+      photoIndex: base + 3,
+      functionOnMovie: "Direção de fotografia",
+      socialIndex: base + 3,
+    }),
+  ];
+}
+
 function makeMovie(params: {
   id: string;
   title: string;
@@ -64,6 +142,7 @@ function makeMovie(params: {
   price: MoviePrice;
   createdAt: string;
   isFeatured?: boolean;
+  collaboratorsSeed: number;
 }): Movie {
   return {
     id: params.id,
@@ -77,6 +156,7 @@ function makeMovie(params: {
     price: params.price,
     createdAt: params.createdAt,
     isFeatured: params.isFeatured,
+    collaborators: makeCollaboratorsForMovie(params.collaboratorsSeed),
   };
 }
 
@@ -97,6 +177,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 20,
         createdAt: "2026-01-28T10:10:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 1,
       }),
       makeMovie({
         id: "m-002",
@@ -109,6 +190,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-02-02T09:40:00.000Z",
+        collaboratorsSeed: 2,
       }),
       makeMovie({
         id: "m-003",
@@ -122,6 +204,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 30,
         createdAt: "2026-02-06T14:20:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 3,
       }),
       makeMovie({
         id: "m-004",
@@ -134,6 +217,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-01-05T11:00:00.000Z",
+        collaboratorsSeed: 4,
       }),
       makeMovie({
         id: "m-005",
@@ -146,6 +230,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/16",
         price: 20,
         createdAt: "2026-01-22T08:35:00.000Z",
+        collaboratorsSeed: 5,
       }),
     ],
   },
@@ -165,6 +250,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 20,
         createdAt: "2026-02-07T10:00:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 6,
       }),
       makeMovie({
         id: "m-007",
@@ -177,6 +263,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/16",
         price: 30,
         createdAt: "2026-01-01T10:00:00.000Z",
+        collaboratorsSeed: 7,
       }),
       makeMovie({
         id: "m-008",
@@ -189,6 +276,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-01-08T10:00:00.000Z",
+        collaboratorsSeed: 8,
       }),
       makeMovie({
         id: "m-009",
@@ -201,6 +289,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-01-12T10:00:00.000Z",
+        collaboratorsSeed: 9,
       }),
       makeMovie({
         id: "m-010",
@@ -213,6 +302,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/16",
         price: 20,
         createdAt: "2026-01-15T10:00:00.000Z",
+        collaboratorsSeed: 10,
       }),
     ],
   },
@@ -231,6 +321,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-02-01T12:10:00.000Z",
+        collaboratorsSeed: 11,
       }),
       makeMovie({
         id: "m-012",
@@ -243,6 +334,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-01-18T09:00:00.000Z",
+        collaboratorsSeed: 12,
       }),
       makeMovie({
         id: "m-013",
@@ -255,6 +347,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-01-03T18:00:00.000Z",
+        collaboratorsSeed: 13,
       }),
       makeMovie({
         id: "m-014",
@@ -267,6 +360,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-01-09T12:00:00.000Z",
+        collaboratorsSeed: 14,
       }),
       makeMovie({
         id: "m-015",
@@ -280,6 +374,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 20,
         createdAt: "2026-01-25T16:00:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 15,
       }),
     ],
   },
@@ -299,6 +394,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 20,
         createdAt: "2026-01-30T11:20:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 16,
       }),
       makeMovie({
         id: "m-017",
@@ -311,6 +407,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/12",
         price: 10,
         createdAt: "2026-01-11T10:00:00.000Z",
+        collaboratorsSeed: 17,
       }),
       makeMovie({
         id: "m-018",
@@ -323,6 +420,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/16",
         price: 20,
         createdAt: "2026-01-20T10:00:00.000Z",
+        collaboratorsSeed: 18,
       }),
       makeMovie({
         id: "m-019",
@@ -335,6 +433,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/16",
         price: 20,
         createdAt: "2026-01-04T10:00:00.000Z",
+        collaboratorsSeed: 19,
       }),
       makeMovie({
         id: "m-020",
@@ -348,6 +447,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 20,
         createdAt: "2026-02-08T09:30:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 20,
       }),
     ],
   },
@@ -366,6 +466,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/18",
         price: 30,
         createdAt: "2026-01-16T22:10:00.000Z",
+        collaboratorsSeed: 21,
       }),
       makeMovie({
         id: "m-022",
@@ -379,6 +480,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 40,
         createdAt: "2026-01-27T19:10:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 22,
       }),
       makeMovie({
         id: "m-023",
@@ -391,6 +493,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/18",
         price: 30,
         createdAt: "2026-01-07T19:10:00.000Z",
+        collaboratorsSeed: 23,
       }),
       makeMovie({
         id: "m-024",
@@ -403,6 +506,7 @@ const MOCK_CATEGORIES: Category[] = [
         ageRating: "M/18",
         price: 30,
         createdAt: "2026-01-02T19:10:00.000Z",
+        collaboratorsSeed: 24,
       }),
       makeMovie({
         id: "m-025",
@@ -416,6 +520,7 @@ const MOCK_CATEGORIES: Category[] = [
         price: 40,
         createdAt: "2026-02-05T19:10:00.000Z",
         isFeatured: true,
+        collaboratorsSeed: 25,
       }),
     ],
   },

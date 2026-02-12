@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useApp, type Movie } from "../Context/AppProvider";
 import "../scss/HomeTrailerDisplay.css";
 
@@ -40,6 +41,7 @@ const MOCK_TRAILERS: TrailerItem[] = [
 ];
 
 export default function HomeTrailerDisplay() {
+  const navigate = useNavigate();
   const { categories } = useApp();
 
   const allMovies = useMemo(() => categories.flatMap((c) => c.movies), [categories]);
@@ -55,6 +57,11 @@ export default function HomeTrailerDisplay() {
   }, [allMovies, selectedTrailer.movieId]);
 
   const embedUrl = useMemo(() => buildYouTubeEmbedUrl(selectedTrailer.youtubeId), [selectedTrailer.youtubeId]);
+
+  const goToMoviePage = (): void => {
+    if (!movie) return;
+    navigate(`/movies/${movie.id}`);
+  };
 
   return (
     <section className="trailerPage" aria-label="Trailer">
@@ -96,19 +103,22 @@ export default function HomeTrailerDisplay() {
                   <span className="chip">{movie ? `${movie.year}` : "—"}</span>
                   <span className="chip">{movie ? `${movie.durationMin} min` : "—"}</span>
                   <span className="chip">{movie ? `Classificação ${movie.ageRating}` : "—"}</span>
-                  <span className="chip chip--price">
-                    {movie ? `${formatEUR(movie.price)} / por filme` : "—"}
-                  </span>
+                  <span className="chip chip--price">{movie ? `${formatEUR(movie.price)} por filme` : "—"}</span>
                 </div>
 
                 <p className="trailerMain__desc">{movie?.description ?? "Sem descrição."}</p>
               </div>
 
               <div className="trailerMain__metaRight">
-                <button type="button" className="trailerBtn trailerBtn--primary">
+                <button
+                  type="button"
+                  className="trailerBtn trailerBtn--primary"
+                  onClick={goToMoviePage}
+                  disabled={!movie}
+                  aria-disabled={!movie}
+                >
                   Ver agora
                 </button>
-                
               </div>
             </div>
           </div>
@@ -147,9 +157,7 @@ export default function HomeTrailerDisplay() {
                         {m ? <span className="trailerItem__price">{formatEUR(m.price)}</span> : null}
                       </div>
                       <div className="trailerItem__name">{m?.title ?? "Indisponível"}</div>
-                      <div className="trailerItem__small">
-                        {m ? `${m.year} · ${m.durationMin} min · ${m.ageRating}` : "—"}
-                      </div>
+                      <div className="trailerItem__small">{m ? `${m.year} · ${m.durationMin} min · ${m.ageRating}` : "—"}</div>
                     </div>
                   </button>
                 );

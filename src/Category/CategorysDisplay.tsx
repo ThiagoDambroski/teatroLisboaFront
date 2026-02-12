@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useApp, type Category, type Movie } from "../Context/AppProvider"; 
+import { useNavigate } from "react-router-dom";
+import { useApp, type Category, type Movie } from "../Context/AppProvider";
 import "../scss/CategorysDisplay.css";
 
 type NavDir = "left" | "right";
@@ -17,11 +18,10 @@ function ArrowIcon(props: React.SVGProps<SVGSVGElement>) {
 
 function pickCategoryMovies(movies: Movie[]): Movie[] {
   if (movies.length <= 4) return movies;
-  return movies.slice(-4); // last 4
+  return movies.slice(-4);
 }
 
 function getScrollStep(container: HTMLElement): number {
-  // scroll roughly one "card width"
   const firstCard = container.querySelector<HTMLElement>("[data-category-card]");
   if (!firstCard) return Math.max(280, container.clientWidth * 0.8);
   const style = window.getComputedStyle(container);
@@ -31,18 +31,17 @@ function getScrollStep(container: HTMLElement): number {
 
 export default function CategorysDisplay() {
   const { categories } = useApp();
+  const navigate = useNavigate();
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [canScroll, setCanScroll] = useState(false);
 
-  // If you have few categories, we switch to a responsive grid
   const useGridLayout = useMemo(() => categories.length <= 4, [categories.length]);
 
   const updateCanScroll = (): void => {
     const el = scrollerRef.current;
     if (!el) return;
 
-    // Only relevant when we use the horizontal scroller layout
     if (useGridLayout) {
       setCanScroll(false);
       return;
@@ -58,7 +57,6 @@ export default function CategorysDisplay() {
     const handleResize = (): void => updateCanScroll();
     window.addEventListener("resize", handleResize);
 
-    // Watch for content size changes (fonts/images)
     const el = scrollerRef.current;
     const ro = el ? new ResizeObserver(() => updateCanScroll()) : null;
     if (el && ro) ro.observe(el);
@@ -80,18 +78,20 @@ export default function CategorysDisplay() {
     el.scrollBy({ left: delta, behavior: "smooth" });
   };
 
+  const openCategory = (categoryId: string): void => {
+    navigate(`/movies?cat=${encodeURIComponent(categoryId)}`);
+  };
+
   return (
     <section className="cats" aria-label="Categories">
       <div className="cats__top">
         <div className="cats__head">
-          <h2 className="cats__title">Explore our wide variety of categories</h2>
+          <h2 className="cats__title">Explore a nossa variedade de categorias</h2>
           <p className="cats__sub">
-            Whether you&apos;re looking for a comedy to make you laugh, a drama to make you think,
-            or a documentary to learn something new.
+            Seja uma comédia para rir, um drama para pensar, ou um documentário para descobrir algo novo.
           </p>
         </div>
 
-        {/* arrows ONLY appear if there is enough categories (i.e., real overflow) */}
         {!useGridLayout && canScroll && (
           <div className="cats__nav" aria-label="Category navigation">
             <button
@@ -121,19 +121,16 @@ export default function CategorysDisplay() {
         )}
       </div>
 
-      {/* Adaptive layout:
-          - few categories => grid
-          - many categories => horizontal scroller */}
       {useGridLayout ? (
         <div className="cats__grid" role="list">
           {categories.map((cat) => (
-            <CategoryCard key={cat.id} category={cat} />
+            <CategoryCard key={cat.id} category={cat} onOpen={openCategory} />
           ))}
         </div>
       ) : (
         <div className="cats__row" ref={scrollerRef} role="list">
           {categories.map((cat) => (
-            <CategoryCard key={cat.id} category={cat} />
+            <CategoryCard key={cat.id} category={cat} onOpen={openCategory} />
           ))}
         </div>
       )}
@@ -141,14 +138,18 @@ export default function CategorysDisplay() {
   );
 }
 
-function CategoryCard({ category }: { category: Category }) {
+function CategoryCard({ category, onOpen }: { category: Category; onOpen: (categoryId: string) => void }) {
   const moviesToShow = useMemo(() => pickCategoryMovies(category.movies), [category.movies]);
-
   const isSingle = moviesToShow.length === 1;
 
   return (
     <article className="catCard" data-category-card role="listitem">
-      <button type="button" className="catCard__btn" aria-label={`Open ${category.name}`}>
+      <button
+        type="button"
+        className="catCard__btn"
+        aria-label={`Open ${category.name}`}
+        onClick={() => onOpen(category.id)}
+      >
         <div className={`catCard__thumb ${isSingle ? "is-single" : "is-grid"}`}>
           {isSingle ? (
             <img
@@ -165,7 +166,6 @@ function CategoryCard({ category }: { category: Category }) {
             </div>
           )}
 
-          {/* soft overlay like screenshot */}
           <div className="catCard__shade" aria-hidden="true" />
         </div>
 
