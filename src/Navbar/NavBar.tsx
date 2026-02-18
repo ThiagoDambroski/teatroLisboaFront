@@ -1,4 +1,6 @@
+// NavBar.tsx
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../scss/Navbar.scss";
 
 type NavItem = {
@@ -9,7 +11,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Pecas", href: "#movies" },
-  { label: "Sobre o projeto", href: "#about" },
+  { label: "Sobre o projeto", href: "#aboutUs" },
 ];
 
 function IconSearch(props: React.SVGProps<SVGSVGElement>) {
@@ -41,13 +43,11 @@ function getActiveHash(): string {
 }
 
 export default function NavBar() {
+  const navigate = useNavigate();
   const [activeHash, setActiveHash] = useState<string>(() => getActiveHash());
 
   useEffect(() => {
-    const onHashChange = (): void => {
-      setActiveHash(getActiveHash());
-    };
-
+    const onHashChange = (): void => setActiveHash(getActiveHash());
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
@@ -59,7 +59,11 @@ export default function NavBar() {
       <div className="tl-navbar__bg" aria-hidden="true" />
 
       <nav className="tl-navbar__content" aria-label="Primary navigation">
-        <a className="tl-navbar__brand" href="#home">
+        <a
+          className="tl-navbar__brand"
+          onClick={() => navigate("/")}
+          style={{ cursor: "pointer" }}
+        >
           Teatro Lisboa
         </a>
 
@@ -76,11 +80,21 @@ export default function NavBar() {
         </div>
 
         <div className="tl-navbar__actions" aria-label="Actions">
-          <button className="tl-navbar__iconBtn" type="button" aria-label="Pesquisar">
+          <button
+            className="tl-navbar__iconBtn"
+            type="button"
+            aria-label="Pesquisar"
+            onClick={() => navigate("/search")}
+          >
             <IconSearch className="tl-navbar__icon" />
           </button>
 
-          <button className="tl-navbar__iconBtn" type="button" aria-label="Conta">
+          <button
+            className="tl-navbar__iconBtn"
+            type="button"
+            aria-label="Conta"
+            onClick={() => navigate("/login")}
+          >
             <IconUser className="tl-navbar__icon" />
           </button>
         </div>

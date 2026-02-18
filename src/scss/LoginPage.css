@@ -1,0 +1,213 @@
+.auth {
+  min-height: 100vh;
+  background: #070707;
+  color: rgba(255, 255, 255, 0.92);
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding-top: 100px;
+  padding-bottom: 70px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.auth__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(900px 420px at 60% 30%, rgba(255, 255, 255, 0.06), transparent 60%), radial-gradient(720px 360px at 30% 70%, rgba(255, 0, 0, 0.06), transparent 55%), -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.35)), to(rgba(0, 0, 0, 0.85)));
+  background: radial-gradient(900px 420px at 60% 30%, rgba(255, 255, 255, 0.06), transparent 60%), radial-gradient(720px 360px at 30% 70%, rgba(255, 0, 0, 0.06), transparent 55%), linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.85));
+}
+
+.auth__shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 800px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 20px;
+}
+
+.auth__back {
+  -ms-flex-item-align: start;
+      align-self: flex-start;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 18, 18, 0.55);
+  color: rgba(255, 255, 255, 0.86);
+  cursor: pointer;
+}
+
+/* CARD MAIOR */
+.authCard {
+  width: 100%;
+  max-width: 720px;
+  padding: 32px;
+  border-radius: 22px;
+  background: rgba(18, 18, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+/* HEADER */
+.authCard__head {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.authCard__badge {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.authCard__title {
+  font-size: 34px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.authCard__sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 520px;
+}
+
+/* FORM */
+.authForm {
+  margin-top: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 18px;
+}
+
+/* FIELDS */
+.field {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 8px;
+}
+
+.field__label {
+  font-size: 13px;
+  text-align: center;
+}
+
+.field__row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 12px;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+/* INPUTS MAIORES */
+.field__input {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  height: 54px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 15px;
+}
+
+.field__iconBtn {
+  height: 54px;
+  padding: 0 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+}
+
+.primaryBtn {
+  height: 54px;
+  border-radius: 14px;
+  background: #e50914;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.ghostBtn {
+  height: 54px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .auth {
+    -webkit-box-align: start;
+        -ms-flex-align: start;
+            align-items: flex-start;
+    padding-top: 80px;
+  }
+  .authCard {
+    padding: 24px;
+  }
+  .authCard__title {
+    font-size: 28px;
+  }
+  .field__input,
+  .field__iconBtn,
+  .primaryBtn,
+  .ghostBtn {
+    height: 48px;
+  }
+}
+/*# sourceMappingURL=LoginPage.css.map */
