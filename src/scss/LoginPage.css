@@ -148,7 +148,7 @@
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  height: 54px;
+  min-height: 54px;
   padding: 0 16px;
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.35);
@@ -176,6 +176,11 @@
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
+}
+
+.primaryBtn:disabled {
+  cursor: not-allowed;
+  background-color: grey;
 }
 
 .ghostBtn {

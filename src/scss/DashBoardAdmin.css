@@ -1,0 +1,303 @@
+@charset "UTF-8";
+/* DashboardAdmin.scss */
+.dash {
+  /* espaço suficiente para não ficar por baixo do NavBar */
+  --dash-top: clamp(88px, 10vh, 128px);
+  padding-top: var(--dash-top);
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 28px;
+  max-width: 1180px;
+  margin: 0 auto;
+  min-height: calc(100vh - var(--dash-top));
+}
+
+.dash--admin {
+  /* fundo/efeito coerente com o resto do site escuro */
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Header do admin (se tens "Admin Dashboard" + ações) */
+.dash__header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.dash__title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.dash__subtitle {
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+/* Tabs */
+.dash__tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 10px;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin: 14px 0 18px 0;
+}
+
+.dash__tab {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  -webkit-transition: background 120ms ease, border-color 120ms ease, -webkit-transform 120ms ease;
+  transition: background 120ms ease, border-color 120ms ease, -webkit-transform 120ms ease;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, -webkit-transform 120ms ease;
+}
+
+.dash__tab:hover {
+  -webkit-transform: translateY(-1px);
+          transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.dash__tab[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+/* Card / painel */
+.dash__panel {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 22px;
+  padding: 18px;
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  -webkit-box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.dash__panelTitle {
+  margin: 0 0 12px 0;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+/* Form (criar vídeo / criar categoria / criar admin) */
+.dashForm {
+  display: -ms-grid;
+  display: grid;
+  gap: 14px;
+}
+
+.dashForm__grid2 {
+  display: -ms-grid;
+  display: grid;
+  gap: 14px;
+  -ms-grid-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 860px) {
+  .dashForm__grid2 {
+    -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+  }
+}
+
+.dashField {
+  display: -ms-grid;
+  display: grid;
+  gap: 8px;
+}
+
+.dashField__label {
+  font-size: 13px;
+  opacity: 0.78;
+}
+
+.dashField__input,
+.dashField__select,
+.dashField__textarea {
+  width: 100%;
+  border-radius: 14px;
+  padding: 12px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  outline: none;
+}
+
+.dashField__textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.dashField__input:focus,
+.dashField__select:focus,
+.dashField__textarea:focus {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.075);
+}
+
+/* Checkbox list (categorias) */
+.dashChecks {
+  display: -ms-grid;
+  display: grid;
+  gap: 10px;
+}
+
+.dashCheck {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Botões */
+.dashActions {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.dashBtn {
+  border-radius: 999px;
+  padding: 11px 16px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  -webkit-transition: background 120ms ease, border-color 120ms ease, -webkit-transform 120ms ease;
+  transition: background 120ms ease, border-color 120ms ease, -webkit-transform 120ms ease;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, -webkit-transform 120ms ease;
+}
+
+.dashBtn:hover {
+  -webkit-transform: translateY(-1px);
+          transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.dashBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  -webkit-transform: none;
+          transform: none;
+}
+
+/* lista/tabela simples */
+.dashList {
+  display: -ms-grid;
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.dashRow {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr auto;
+      grid-template-columns: 1fr auto;
+  gap: 12px;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dashRow__meta {
+  opacity: 0.75;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* mensagens */
+.dashMsg {
+  margin-top: 14px;
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dashMsg--error {
+  border-color: rgba(255, 90, 90, 0.35);
+  background: rgba(255, 90, 90, 0.07);
+}
+
+.dashMsg--ok {
+  border-color: rgba(80, 220, 140, 0.35);
+  background: rgba(80, 220, 140, 0.06);
+}
+
+.dashField__select {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 44px 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* seta */
+  background-image: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.75) 50%), linear-gradient(135deg, rgba(255, 255, 255, 0.75) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.dashField__select:focus {
+  border-color: rgba(255, 255, 255, 0.28);
+  -webkit-box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+          box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+.dashField__select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dashField__select option {
+  background: #0e0e0f;
+  color: rgba(255, 255, 255, 0.92);
+}
+/*# sourceMappingURL=DashBoardAdmin.css.map */

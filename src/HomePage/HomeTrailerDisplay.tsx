@@ -70,7 +70,7 @@ export default function HomeTrailerDisplay() {
           <div className="trailerTop__left">
             <h1 className="trailerTop__title">Trailer</h1>
             <p className="trailerTop__sub">
-              Veja o trailer em destaque e descubra outros conteúdos do Teatro Lisboa.
+              Veja o trailer em destaque e descubra outros conteúdos do Cinema Teatral OTL.
             </p>
           </div>
 

@@ -1,6 +1,6 @@
-// NavBar.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 import "../scss/Navbar.scss";
 
 type NavItem = {
@@ -11,7 +11,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Pecas", href: "#movies" },
-  { label: "Sobre o projeto", href: "#aboutUs" },
+  { label: "Sobre Cinema Teatral OTL", href: "#aboutUs" },
 ];
 
 function IconSearch(props: React.SVGProps<SVGSVGElement>) {
@@ -44,6 +44,7 @@ function getActiveHash(): string {
 
 export default function NavBar() {
   const navigate = useNavigate();
+  const { isAuthenticated, isAdmin } = useAuth();
   const [activeHash, setActiveHash] = useState<string>(() => getActiveHash());
 
   useEffect(() => {
@@ -53,6 +54,15 @@ export default function NavBar() {
   }, []);
 
   const nav = useMemo(() => NAV, []);
+
+  const onUserClick = (): void => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    navigate(isAdmin ? "/admin" : "/dashboard");
+  };
 
   return (
     <header className="tl-navbar" role="banner">
@@ -64,7 +74,7 @@ export default function NavBar() {
           onClick={() => navigate("/")}
           style={{ cursor: "pointer" }}
         >
-          Teatro Lisboa
+          Cinema Teatral OTL
         </a>
 
         <div className="tl-navbar__pill">
@@ -93,7 +103,7 @@ export default function NavBar() {
             className="tl-navbar__iconBtn"
             type="button"
             aria-label="Conta"
-            onClick={() => navigate("/login")}
+            onClick={onUserClick}
           >
             <IconUser className="tl-navbar__icon" />
           </button>

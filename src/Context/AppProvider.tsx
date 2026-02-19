@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type AgeRating = "L" | "M/12" | "M/16" | "M/18";
 export type MoviePrice = 10 | 20 | 30 | 40;
@@ -35,6 +41,10 @@ export type Category = {
 type AppContextType = {
   lightBox: boolean;
   toggleLightBox: () => void;
+
+  isAuthenticated: boolean;
+  loginMock: () => void;
+  logout: () => void;
 
   categories: Category[];
   getCategoryById: (categoryId: string) => Category | undefined;
@@ -528,9 +538,18 @@ const MOCK_CATEGORIES: Category[] = [
 
 function AppProvider({ children }: AppProviderProps) {
   const [lightBox, setLightBox] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const toggleLightBox = (): void => {
     setLightBox((prev) => !prev);
+  };
+
+  const loginMock = (): void => {
+    setIsAuthenticated(true);
+  };
+
+  const logout = (): void => {
+    setIsAuthenticated(false);
   };
 
   const categories = useMemo<Category[]>(() => MOCK_CATEGORIES, []);
@@ -556,6 +575,9 @@ function AppProvider({ children }: AppProviderProps) {
       value={{
         lightBox,
         toggleLightBox,
+        isAuthenticated,
+        loginMock,
+        logout,
         categories,
         getCategoryById,
         getMoviesByCategoryId,

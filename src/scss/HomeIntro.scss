@@ -9,6 +9,20 @@
   place-items: center;
 }
 
+
+/* ---------- VIDEO ---------- */
+
+.homeIntro__video {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;   // 👈 mostra o vídeo inteiro
+  object-position: center;
+
+  background: #000;      // evita fundo branco nas laterais
+}
+
+
 /* ---------- BACKGROUND (ONE SOLID IMAGE) ---------- */
 
 .homeIntro__bg {

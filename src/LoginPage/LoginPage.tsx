@@ -1,6 +1,18 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useApp } from "../Context/AppProvider";
+import { createUser } from "../api/user";
+import type { ApiError } from "../api/http";
+import { login } from "../api/auth";
+import { useAuth } from "../auth/AuthProvider";
+import { Navigate } from "react-router-dom";
+
+
 import "../scss/LoginPage.css";
+
+
+
+
 
 type PageKey = "login" | "create" | "forgot";
 
@@ -8,20 +20,44 @@ function isEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
 
+function clampInt(value: number, min: number, max: number): number {
+  if (Number.isNaN(value)) return min;
+  return Math.min(max, Math.max(min, Math.trunc(value)));
+}
+
+type LocationState = {
+  from?: string;
+};
+
+function getErrorMessage(err: unknown): string {
+  const maybe = err as Partial<ApiError> | null;
+  if (maybe && typeof maybe === "object" && typeof maybe.message === "string") {
+    return maybe.message;
+  }
+  return "Não foi possível concluir. Tente novamente.";
+}
+
 function LoginPage() {
+  const { isAuthenticated, isAdmin } = useAuth();
+
+  if (isAuthenticated) {
+    return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
+  }
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = (location.state as LocationState | null)?.from ?? "/movies";
 
   const [page, setPage] = useState<PageKey>("login");
 
-  // shared
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // create account
-  const [fullName, setFullName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [age, setAge] = useState<string>("");
+  const [newsletterEmailAccept, setNewsletterEmailAccept] = useState(false);
+  const [locationText, setLocationText] = useState("");
 
-  // forgot
   const [forgotEmail, setForgotEmail] = useState("");
 
   const [showPass, setShowPass] = useState(false);
@@ -34,13 +70,32 @@ function LoginPage() {
     return isEmail(email) && password.trim().length >= 6 && !busy;
   }, [email, password, busy]);
 
+  const parsedAge = useMemo(() => {
+    const trimmed = age.trim();
+    if (!trimmed) return null;
+
+    const n = Number(trimmed);
+    if (!Number.isFinite(n)) return null;
+
+    const asInt = Math.trunc(n);
+    if (asInt < 0) return null;
+
+    return asInt;
+  }, [age]);
+
   const canCreate = useMemo(() => {
-    const okEmail = isEmail(email);
-    const okName = fullName.trim().length >= 2;
-    const okPass = password.trim().length >= 6;
-    const okMatch = confirmPassword.trim().length >= 6 && confirmPassword === password;
-    return okEmail && okName && okPass && okMatch && !busy;
-  }, [email, fullName, password, confirmPassword, busy]);
+    const e = email.trim();
+    const p = password.trim();
+    const cp = confirmPassword.trim();
+    const locOk = locationText.trim().length <= 120;
+
+    const okEmail = isEmail(e);
+    const okPass = p.length >= 6 && p.length <= 72;
+    const okMatch = cp.length >= 6 && cp === p;
+    const ageOk = parsedAge !== null;
+
+    return okEmail && okPass && okMatch && ageOk && locOk && !busy;
+  }, [email, password, confirmPassword, parsedAge, locationText, busy]);
 
   const canForgot = useMemo(() => {
     return isEmail(forgotEmail) && !busy;
@@ -52,49 +107,64 @@ function LoginPage() {
     resetMessages();
     setPage(p);
 
-    // keep email between pages (nice UX), but reset passwords
     setPassword("");
     setConfirmPassword("");
     setShowPass(false);
     setShowPass2(false);
   };
+const { setAccessToken } = useAuth();
 
-  // MOCK handlers (replace with your API calls)
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canLogin) return;
+ const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!canLogin) return;
 
-    setBusy(true);
-    setMessage(null);
+  setBusy(true);
+  setMessage(null);
 
-    try {
-      // TODO: call backend
-      await new Promise((r) => setTimeout(r, 600));
-      // navigate to movies or wherever makes sense
-      navigate("/movies");
-    } catch {
-      setMessage("Não foi possível entrar. Verifique os dados e tente novamente.");
-    } finally {
-      setBusy(false);
+  try {
+    const res = await login({ email: email.trim(), password: password.trim() });
+    setAccessToken(res.accessToken);
+
+    const payload = res.accessToken.split(".")[1];
+    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/").padEnd(payload.length + (4 - (payload.length % 4)) % 4, "=")));
+    const rolesStr = typeof decoded?.roles === "string" ? decoded.roles : "";
+    const roles = rolesStr.trim() ? rolesStr.trim().split(/\s+/) : [];
+
+    if (roles.includes("ROLE_ADMIN")) {
+      navigate("/admin", { replace: true });
+      return;
     }
-  };
 
+    navigate("/dashboard", { replace: true });
+  } catch (err) {
+    setMessage(getErrorMessage(err));
+  } finally {
+    setBusy(false);
+  }
+};
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canCreate) return;
 
+    const payload = {
+      email: email.trim(),
+      rawPassword: password.trim(),
+      age: clampInt(parsedAge ?? 0, 0, 150),
+      newsletterEmailAccept,
+      location: locationText.trim() ? locationText.trim() : null,
+    };
+
     setBusy(true);
     setMessage(null);
 
     try {
-      // TODO: call backend
-      await new Promise((r) => setTimeout(r, 700));
+      await createUser(payload);
       setMessage("Conta criada com sucesso. Pode entrar agora.");
       setPage("login");
       setConfirmPassword("");
       setPassword("");
-    } catch {
-      setMessage("Não foi possível criar a conta. Tente novamente.");
+    } catch (err) {
+      setMessage(getErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -108,8 +178,6 @@ function LoginPage() {
     setMessage(null);
 
     try {
-      // TODO: call backend
-      await new Promise((r) => setTimeout(r, 650));
       setMessage("Se existir uma conta com este email, enviámos um link de recuperação.");
     } catch {
       setMessage("Não foi possível enviar a recuperação. Tente novamente.");
@@ -229,22 +297,6 @@ function LoginPage() {
           ) : page === "create" ? (
             <form className="authForm" onSubmit={handleCreate}>
               <div className="field">
-                <label className="field__label" htmlFor="name">
-                  Nome
-                </label>
-                <input
-                  id="name"
-                  className="field__input"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  onFocus={resetMessages}
-                  placeholder="ex: Letícia Lima"
-                  autoComplete="name"
-                />
-              </div>
-
-              <div className="field">
                 <label className="field__label" htmlFor="createEmail">
                   Email
                 </label>
@@ -257,6 +309,42 @@ function LoginPage() {
                   onFocus={resetMessages}
                   placeholder="ex: nome@dominio.com"
                   autoComplete="email"
+                />
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="age">
+                  Idade
+                </label>
+                <input
+                  id="age"
+                  className="field__input"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={150}
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  onFocus={resetMessages}
+                  placeholder="ex: 28"
+                  autoComplete="bday-year"
+                />
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="location">
+                  Localização (opcional)
+                </label>
+                <input
+                  id="location"
+                  className="field__input"
+                  type="text"
+                  value={locationText}
+                  onChange={(e) => setLocationText(e.target.value)}
+                  onFocus={resetMessages}
+                  placeholder="ex: Lisboa"
+                  maxLength={120}
+                  autoComplete="address-level2"
                 />
               </div>
 
@@ -307,7 +395,7 @@ function LoginPage() {
                     type="button"
                     className="field__iconBtn"
                     onClick={() => setShowPass2((p) => !p)}
-                    aria-label={showPass2 ? "Ocultar palavra-passe" : "Mostrar palavra-passe"}
+                    aria-label={showPass2 ? "Ocultar palavra-passe" : "Mostrar"}
                   >
                     {showPass2 ? "Ocultar" : "Mostrar"}
                   </button>
@@ -316,6 +404,26 @@ function LoginPage() {
                 {confirmPassword.length > 0 && confirmPassword !== password ? (
                   <div className="field__hint">As palavras-passe não coincidem.</div>
                 ) : null}
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="newsletter">
+                  Newsletter por email
+                </label>
+
+                <div className="field__row">
+                  <input
+                    id="newsletter"
+                    type="checkbox"
+                    checked={newsletterEmailAccept}
+                    onChange={(e) => setNewsletterEmailAccept(e.target.checked)}
+                    onFocus={resetMessages}
+                    aria-label="Aceito receber newsletter por email"
+                  />
+                  <span className="field__hint" style={{ margin: 0 }}>
+                    Quero receber novidades por email.
+                  </span>
+                </div>
               </div>
 
               <button type="submit" className="primaryBtn" disabled={!canCreate}>

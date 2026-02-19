@@ -173,7 +173,7 @@ export default function CatalogyDisplay() {
               <span className="catalogyDisplay__badge">Peças</span>
               <h2 className="catalogyDisplay__title">Explorar</h2>
               <p className="catalogyDisplay__sub">
-                Navegue por categorias, descubra os mais recentes e veja os destaques do Teatro Lisboa.
+                Navegue por categorias, descubra os mais recentes e veja os destaques do Cinema Teatral OTL.
               </p>
             </div>
 
