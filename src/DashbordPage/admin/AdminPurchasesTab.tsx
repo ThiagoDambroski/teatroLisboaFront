@@ -16,18 +16,13 @@ function toDateValue(x?: string) {
   return Number.isFinite(t) ? t : null;
 }
 
-// helpers com fallback
 function getEmail(p: PurchaseResponse): string {
-  // se o backend já manda email
-  const anyP = p as any;
-  const email = typeof anyP.userEmail === "string" ? anyP.userEmail.trim() : "";
+  const email = (p.userEmail ?? "").trim();
   return email || `#${p.userId}`;
 }
 
 function getVideoName(p: PurchaseResponse): string {
-  // se o backend já manda nome
-  const anyP = p as any;
-  const name = typeof anyP.videoName === "string" ? anyP.videoName.trim() : "";
+  const name = (p.videoName ?? "").trim();
   return name || `#${p.streamingVideoId}`;
 }
 
@@ -38,7 +33,6 @@ export default function AdminPurchasesTab() {
 
   const [purchases, setPurchases] = useState<PurchaseResponse[]>([]);
 
-  // filtros
   const [q, setQ] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [videoNameFilter, setVideoNameFilter] = useState("");
@@ -71,54 +65,35 @@ export default function AdminPurchasesTab() {
   const filtered = useMemo(() => {
     let list = purchases;
 
-    // filtro por email (contém)
     if (emailQ) {
       list = list.filter((p) => getEmail(p).toLowerCase().includes(emailQ));
     }
 
-    // filtro por nome do vídeo (contém)
     if (videoQ) {
       list = list.filter((p) => getVideoName(p).toLowerCase().includes(videoQ));
     }
 
-    // pesquisa geral
     if (normalizedQ) {
       list = list.filter((p) => {
-        const hay = [
-          p.purchaseId,
-          getEmail(p),
-          getVideoName(p),
-          p.createdAt ?? "",
-          p.expiresAt ?? "",
-          p.pricePaid ?? "",
-          p.currency ?? "",
-        ]
-          .join(" ")
-          .toLowerCase();
-
+        const hay = [p.purchaseId, getEmail(p), getVideoName(p), p.purchasedAt ?? ""].join(" ").toLowerCase();
         return hay.includes(normalizedQ);
       });
     }
 
-    const sorted = [...list].sort((a, b) => {
+    return [...list].sort((a, b) => {
       if (orderBy === "email") return getEmail(a).localeCompare(getEmail(b), "pt", { sensitivity: "base" });
       if (orderBy === "video") return getVideoName(a).localeCompare(getVideoName(b), "pt", { sensitivity: "base" });
 
-      const ta = toDateValue(a.createdAt);
-      const tb = toDateValue(b.createdAt);
+      const ta = toDateValue(a.purchasedAt);
+      const tb = toDateValue(b.purchasedAt);
 
       if (ta != null && tb != null) return orderBy === "recent" ? tb - ta : ta - tb;
 
-      // fallback: purchaseId
       return orderBy === "recent"
         ? (b.purchaseId ?? 0) - (a.purchaseId ?? 0)
         : (a.purchaseId ?? 0) - (b.purchaseId ?? 0);
     });
-
-    return sorted;
   }, [purchases, normalizedQ, emailQ, videoQ, orderBy]);
-
-  const canRefresh = !busy;
 
   const clearFilters = () => {
     setQ("");
@@ -207,18 +182,11 @@ export default function AdminPurchasesTab() {
           </div>
 
           <div className="dashActions">
-            <button className="dashBtn" type="button" onClick={() => void load()} disabled={!canRefresh}>
+            <button className="dashBtn" type="button" onClick={() => void load()} disabled={busy}>
               {busy ? "A carregar..." : "Atualizar"}
             </button>
 
-            <button
-              className="dashBtn"
-              type="button"
-              onClick={() => {
-                clearFilters();
-              }}
-              disabled={busy}
-            >
+            <button className="dashBtn" type="button" onClick={clearFilters} disabled={busy}>
               Limpar
             </button>
           </div>
@@ -242,9 +210,7 @@ export default function AdminPurchasesTab() {
                 <th style={{ padding: "10px 10px", opacity: 0.8 }}>Compra</th>
                 <th style={{ padding: "10px 10px", opacity: 0.8 }}>Email</th>
                 <th style={{ padding: "10px 10px", opacity: 0.8 }}>Vídeo</th>
-                <th style={{ padding: "10px 10px", opacity: 0.8 }}>Criada em</th>
-                <th style={{ padding: "10px 10px", opacity: 0.8 }}>Expira</th>
-                <th style={{ padding: "10px 10px", opacity: 0.8 }}>Valor</th>
+                <th style={{ padding: "10px 10px", opacity: 0.8 }}>Comprada em</th>
                 <th style={{ padding: "10px 10px", opacity: 0.8 }} />
               </tr>
             </thead>
@@ -260,20 +226,7 @@ export default function AdminPurchasesTab() {
                   <td style={{ padding: "12px 10px" }}>{getVideoName(p)}</td>
 
                   <td style={{ padding: "12px 10px" }}>
-                    {p.createdAt ? new Date(p.createdAt).toLocaleString("pt-PT") : "—"}
-                  </td>
-                  <td style={{ padding: "12px 10px" }}>
-                    {p.expiresAt ? new Date(p.expiresAt).toLocaleString("pt-PT") : "—"}
-                  </td>
-
-                  <td style={{ padding: "12px 10px" }}>
-                    {typeof p.pricePaid === "number" ? (
-                      <>
-                        {p.pricePaid} {p.currency ?? "EUR"}
-                      </>
-                    ) : (
-                      "—"
-                    )}
+                    {p.purchasedAt ? new Date(p.purchasedAt).toLocaleString("pt-PT") : "—"}
                   </td>
 
                   <td style={{ padding: "12px 10px" }}>
@@ -288,7 +241,7 @@ export default function AdminPurchasesTab() {
 
               {!busy && filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: "14px 10px", opacity: 0.75 }}>
+                  <td colSpan={5} style={{ padding: "14px 10px", opacity: 0.75 }}>
                     Sem compras.
                   </td>
                 </tr>

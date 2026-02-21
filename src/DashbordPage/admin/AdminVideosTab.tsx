@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ApiError } from "../../api/http";
 import { getVideoCategories, type VideoCategoryResponse } from "../../api/videoCategories";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../../api/streamingVideos";
 import { getPurchasesByVideo } from "../../api/purchasesAdmin";
 import { getCollaborators, type CollaboratorResponse } from "../../api/collaborators";
+import { uploadImage } from "../../api/uploads";
 
 function getErrorMessage(err: unknown): string {
   const maybe = err as Partial<ApiError> | null;
@@ -25,7 +26,6 @@ type VideoRowStats = {
   purchaseCount?: number;
 };
 
-// ENUM DO BACKEND (nomes do enum)
 const AGE_RATINGS = ["L", "M3", "M6", "M12", "M14", "M16", "M18"] as const;
 type AgeRatingValue = (typeof AGE_RATINGS)[number];
 
@@ -33,7 +33,6 @@ function isAgeRatingValue(v: string): v is AgeRatingValue {
   return (AGE_RATINGS as readonly string[]).includes(v);
 }
 
-// Labels em PT
 function ageLabel(v: AgeRatingValue): string {
   switch (v) {
     case "L":
@@ -96,19 +95,19 @@ export default function AdminVideosTab() {
   const [q, setQ] = useState("");
   const [statsById, setStatsById] = useState<Record<number, VideoRowStats>>({});
 
-  // create form
   const [name, setName] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [trailerUrl, setTrailerUrl] = useState("");
-  const [thumbImage, setThumbImage] = useState(""); // obrigatório
+  const [thumbImage, setThumbImage] = useState("");
   const [synopsis, setSynopsis] = useState("");
-  const [ageRating, setAgeRating] = useState<AgeRatingValue>("L"); // obrigatório
+  const [ageRating, setAgeRating] = useState<AgeRatingValue>("L");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [collaboratorIds, setCollaboratorIds] = useState<number[]>([]);
 
-  // ✅ NOVO: price/year (inputs como string para controlar melhor)
   const [priceStr, setPriceStr] = useState("");
   const [yearStr, setYearStr] = useState("");
+
+  const thumbCreateInputRef = useRef<HTMLInputElement | null>(null);
 
   const load = async () => {
     setBusy(true);
@@ -136,6 +135,7 @@ export default function AdminVideosTab() {
   }, [videos, q]);
 
   const parsedPrice = useMemo(() => toNumberOrNull(priceStr.trim()), [priceStr]);
+
   const parsedYear = useMemo(() => {
     const n = toNumberOrNull(yearStr.trim());
     if (n == null) return null;
@@ -149,15 +149,36 @@ export default function AdminVideosTab() {
 
     if (!thumbImage.trim() || thumbImage.trim().length > 500) return false;
 
-    if (trailerUrl.trim().length > 500) return false;
+    if (!trailerUrl.trim() || trailerUrl.trim().length > 500) return false;
     if (synopsis.trim().length > 2000) return false;
 
-    // ✅ NOVO: price/year obrigatórios
-    if (parsedPrice == null || parsedPrice < 0) return false;
-    if (parsedYear == null) return false;
+    if (parsedPrice == null || parsedPrice <= 0) return false;
+    if (parsedYear == null || parsedYear < 1900) return false;
 
     return Boolean(ageRating);
   }, [busy, name, videoUrl, trailerUrl, thumbImage, synopsis, ageRating, parsedPrice, parsedYear]);
+
+  const pickCreateThumb = () => {
+    thumbCreateInputRef.current?.click();
+  };
+
+  const onCreateThumbSelected = async (file: File | null) => {
+    if (!file) return;
+
+    setBusy(true);
+    setError(null);
+    setOk(null);
+
+    try {
+      const { url } = await uploadImage(file);
+      setThumbImage(url);
+      setOk("Imagem enviada.");
+    } catch (e) {
+      setError(getErrorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const onCreate = async () => {
     if (!canCreate) return;
@@ -174,11 +195,8 @@ export default function AdminVideosTab() {
         synopsis: synopsis.trim() ? synopsis.trim() : null,
         thumbImage: thumbImage.trim(),
         ageRating,
-
-        // ✅ NOVO
-        price: parsedPrice!, // já validado em canCreate
-        year: parsedYear!,   // já validado em canCreate
-
+        price: parsedPrice!,
+        year: parsedYear!,
         categoryIds,
         collaboratorIds,
       };
@@ -194,8 +212,6 @@ export default function AdminVideosTab() {
       setAgeRating("L");
       setCategoryIds([]);
       setCollaboratorIds([]);
-
-      // ✅ reset
       setPriceStr("");
       setYearStr("");
 
@@ -250,12 +266,7 @@ export default function AdminVideosTab() {
           <div className="dashForm__grid2">
             <label className="dashField">
               <span className="dashField__label">Nome</span>
-              <input
-                className="dashField__input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={200}
-              />
+              <input className="dashField__input" value={name} onChange={(e) => setName(e.target.value)} maxLength={200} />
             </label>
 
             <label className="dashField">
@@ -274,7 +285,6 @@ export default function AdminVideosTab() {
             </label>
           </div>
 
-          {/* ✅ NOVO: price + year */}
           <div className="dashForm__grid2">
             <label className="dashField">
               <span className="dashField__label">Preço (EUR)</span>
@@ -311,17 +321,12 @@ export default function AdminVideosTab() {
 
           <label className="dashField">
             <span className="dashField__label">URL do vídeo</span>
-            <input
-              className="dashField__input"
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              maxLength={500}
-            />
+            <input className="dashField__input" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} maxLength={500} />
           </label>
 
           <div className="dashForm__grid2">
             <label className="dashField">
-              <span className="dashField__label">URL do trailer (opcional)</span>
+              <span className="dashField__label">URL do trailer</span>
               <input
                 className="dashField__input"
                 value={trailerUrl}
@@ -331,13 +336,28 @@ export default function AdminVideosTab() {
             </label>
 
             <label className="dashField">
-              <span className="dashField__label">Imagem de capa (obrigatória)</span>
+              <span className="dashField__label">Imagem de capa</span>
               <input
                 className="dashField__input"
                 value={thumbImage}
-                onChange={(e) => setThumbImage(e.target.value)}
-                maxLength={500}
+                readOnly
+                placeholder="Clique para escolher uma imagem…"
+                onClick={pickCreateThumb}
               />
+              <input
+                ref={thumbCreateInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={(e) => void onCreateThumbSelected(e.target.files?.[0] ?? null)}
+              />
+              {thumbImage ? (
+                <img
+                  src={thumbImage}
+                  alt="Capa"
+                  style={{ marginTop: 10, width: 180, height: 100, borderRadius: 14, objectFit: "cover" }}
+                />
+              ) : null}
             </label>
           </div>
 
@@ -479,12 +499,7 @@ function VideoCard({
   collaborators: CollaboratorResponse[];
   busy: boolean;
   purchaseCount?: number;
-  onSave: (
-    id: number,
-    patch: StreamingVideoUpdateRequest,
-    categoryIds: number[],
-    collaboratorIds: number[]
-  ) => Promise<void> | void;
+  onSave: (id: number, patch: StreamingVideoUpdateRequest, categoryIds: number[], collaboratorIds: number[]) => Promise<void> | void;
   onDelete: (id: number) => Promise<void> | void;
 }) {
   const [name, setName] = useState(video.name);
@@ -496,9 +511,10 @@ function VideoCard({
   const [catIds, setCatIds] = useState<number[]>(video.categoryIds ?? []);
   const [collabIds, setCollabIds] = useState<number[]>(video.collaboratorIds ?? []);
 
-  // ✅ NOVO
   const [priceStr, setPriceStr] = useState(String(video.price ?? 0));
   const [yearStr, setYearStr] = useState(String(video.year ?? new Date().getFullYear()));
+
+  const thumbEditInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setName(video.name);
@@ -514,6 +530,7 @@ function VideoCard({
   }, [video]);
 
   const parsedPrice = useMemo(() => toNumberOrNull(priceStr.trim()), [priceStr]);
+
   const parsedYear = useMemo(() => {
     const n = toNumberOrNull(yearStr.trim());
     if (n == null) return null;
@@ -541,8 +558,6 @@ function VideoCard({
     thumbImage: thumb.trim(),
     synopsis: synopsis.trim() ? synopsis.trim() : null,
     ageRating,
-
-    // ✅ NOVO
     price: parsedPrice ?? undefined,
     year: parsedYear ?? undefined,
   };
@@ -559,15 +574,25 @@ function VideoCard({
 
   const ageFromVideo = normalizeAgeRating(video.ageRating);
 
+  const pickEditThumb = () => {
+    thumbEditInputRef.current?.click();
+  };
+
+  const onEditThumbSelected = async (file: File | null) => {
+    if (!file) return;
+    try {
+      const { url } = await uploadImage(file);
+      setThumb(url);
+    } catch {
+      return;
+    }
+  };
+
   return (
     <article className="dash__panel">
       <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
         {video.thumbImage ? (
-          <img
-            src={video.thumbImage}
-            alt={video.name}
-            style={{ width: 96, height: 96, borderRadius: 16, objectFit: "cover" }}
-          />
+          <img src={video.thumbImage} alt={video.name} style={{ width: 96, height: 96, borderRadius: 16, objectFit: "cover" }} />
         ) : (
           <div style={{ width: 96, height: 96, borderRadius: 16, background: "rgba(255,255,255,0.06)" }} />
         )}
@@ -578,8 +603,8 @@ function VideoCard({
               <h3 style={{ margin: 0, fontSize: 18 }}>{video.name}</h3>
 
               <div style={{ opacity: 0.75, fontSize: 13, marginTop: 6 }}>
-                likes: <strong>{video.likes}</strong> · classificação: <strong>{ageLabel(ageFromVideo)}</strong> ·{" "}
-                preço: <strong>{formatEUR(video.price ?? 0)}</strong> · ano: <strong>{video.year ?? "—"}</strong>
+                likes: <strong>{video.likes}</strong> · classificação: <strong>{ageLabel(ageFromVideo)}</strong> · preço:{" "}
+                <strong>{formatEUR(video.price ?? 0)}</strong> · ano: <strong>{video.year ?? "—"}</strong>
                 {typeof purchaseCount === "number" ? (
                   <>
                     {" "}
@@ -590,12 +615,7 @@ function VideoCard({
             </div>
 
             <div className="dashActions" style={{ marginTop: 0 }}>
-              <button
-                className="dashBtn"
-                type="button"
-                onClick={() => onSave(video.streamingVideoId, patch, catIds, collabIds)}
-                disabled={!canSave}
-              >
+              <button className="dashBtn" type="button" onClick={() => onSave(video.streamingVideoId, patch, catIds, collabIds)} disabled={!canSave}>
                 Guardar
               </button>
               <button className="dashBtn" type="button" onClick={() => onDelete(video.streamingVideoId)} disabled={busy}>
@@ -628,21 +648,12 @@ function VideoCard({
             <div className="dashForm__grid2">
               <label className="dashField">
                 <span className="dashField__label">Nome</span>
-                <input
-                  className="dashField__input"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={200}
-                />
+                <input className="dashField__input" value={name} onChange={(e) => setName(e.target.value)} maxLength={200} />
               </label>
 
               <label className="dashField">
                 <span className="dashField__label">Classificação etária</span>
-                <select
-                  className="dashField__select"
-                  value={ageRating}
-                  onChange={(e) => setAgeRating(normalizeAgeRating(e.target.value))}
-                >
+                <select className="dashField__select" value={ageRating} onChange={(e) => setAgeRating(normalizeAgeRating(e.target.value))}>
                   {AGE_RATINGS.map((v) => (
                     <option key={v} value={v}>
                       {ageLabel(v)}
@@ -652,55 +663,39 @@ function VideoCard({
               </label>
             </div>
 
-            {/* ✅ NOVO: price/year */}
             <div className="dashForm__grid2">
               <label className="dashField">
                 <span className="dashField__label">Preço (EUR)</span>
-                <input
-                  className="dashField__input"
-                  value={priceStr}
-                  onChange={(e) => setPriceStr(e.target.value)}
-                  inputMode="decimal"
-                  placeholder="ex.: 4.99"
-                />
+                <input className="dashField__input" value={priceStr} onChange={(e) => setPriceStr(e.target.value)} inputMode="decimal" placeholder="ex.: 4.99" />
               </label>
 
               <label className="dashField">
                 <span className="dashField__label">Ano</span>
-                <input
-                  className="dashField__input"
-                  value={yearStr}
-                  onChange={(e) => setYearStr(e.target.value)}
-                  inputMode="numeric"
-                  placeholder="ex.: 2024"
-                />
+                <input className="dashField__input" value={yearStr} onChange={(e) => setYearStr(e.target.value)} inputMode="numeric" placeholder="ex.: 2024" />
               </label>
             </div>
 
             <label className="dashField">
               <span className="dashField__label">URL do vídeo</span>
-              <input
-                className="dashField__input"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                maxLength={500}
-              />
+              <input className="dashField__input" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} maxLength={500} />
             </label>
 
             <div className="dashForm__grid2">
               <label className="dashField">
                 <span className="dashField__label">URL do trailer (opcional)</span>
-                <input
-                  className="dashField__input"
-                  value={trailerUrl}
-                  onChange={(e) => setTrailerUrl(e.target.value)}
-                  maxLength={500}
-                />
+                <input className="dashField__input" value={trailerUrl} onChange={(e) => setTrailerUrl(e.target.value)} maxLength={500} />
               </label>
 
               <label className="dashField">
                 <span className="dashField__label">Imagem de capa (obrigatória)</span>
-                <input className="dashField__input" value={thumb} onChange={(e) => setThumb(e.target.value)} maxLength={500} />
+                <input className="dashField__input" value={thumb} readOnly placeholder="Clique para escolher uma imagem…" onClick={pickEditThumb} />
+                <input
+                  ref={thumbEditInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => void onEditThumbSelected(e.target.files?.[0] ?? null)}
+                />
               </label>
             </div>
 
@@ -741,9 +736,7 @@ function VideoCard({
                         type="checkbox"
                         checked={checked}
                         onChange={(e) => {
-                          setCollabIds((prev) =>
-                            e.target.checked ? [...prev, c.collaboratorId] : prev.filter((x) => x !== c.collaboratorId)
-                          );
+                          setCollabIds((prev) => (e.target.checked ? [...prev, c.collaboratorId] : prev.filter((x) => x !== c.collaboratorId)));
                         }}
                       />
                       <span>
@@ -759,5 +752,4 @@ function VideoCard({
       </div>
     </article>
   );
-
 }

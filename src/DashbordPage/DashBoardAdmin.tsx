@@ -10,8 +10,9 @@ import AdminCreateAdminTab from "./admin/AdminCreateAdminTab";
 import AdminAccountTab from "./admin/AdminAccountTab";
 import AdminCollaboratorsTab from "./admin/AdminCollaboratorsTab"; 
 import AdminPurchasesTab from "./admin/AdminPurchasesTab";
+import AdminConfigTab from "./admin/AdminConfigTab";
 
-type TabKey = "users" | "videos" | "categories" | "collaborators" | "purchases" | "createAdmin" | "account";
+type TabKey = "users" | "videos" | "categories" | "collaborators" | "purchases" | "createAdmin" | "account" | "config";
 
 
 export default function DashBoardAdmin() {
@@ -98,6 +99,13 @@ export default function DashBoardAdmin() {
         >
           Compras
         </button>
+        <button
+          className={tabBtnClass("createAdmin")}
+          type="button"
+          onClick={() => setTab("config")}
+          aria-pressed={tab === "createAdmin"}>
+        Config
+      </button>
 
 
         <button
@@ -122,6 +130,7 @@ export default function DashBoardAdmin() {
         {tab === "createAdmin" ? <AdminCreateAdminTab /> : null}
         {tab === "account" ? <AdminAccountTab /> : null}
         {tab === "purchases" ? <AdminPurchasesTab /> : null}
+        {tab === "config" ? <AdminConfigTab /> : null}
 
       </section>
     </main>

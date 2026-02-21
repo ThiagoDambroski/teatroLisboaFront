@@ -14,15 +14,20 @@ function getBaseUrl(): string {
   return url.replace(/\/+$/, "");
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 async function parseError(res: Response): Promise<ApiError> {
   const contentType = res.headers.get("content-type") ?? "";
   const status = res.status;
 
   if (contentType.includes("application/json")) {
-    const body = (await res.json().catch(() => null)) as any;
+    const body = (await res.json().catch(() => null)) as unknown;
+
     const message =
-      (typeof body?.message === "string" && body.message) ||
-      (typeof body?.error === "string" && body.error) ||
+      (isRecord(body) && typeof body.message === "string" && body.message) ||
+      (isRecord(body) && typeof body.error === "string" && body.error) ||
       DEFAULT_ERROR_MESSAGE;
 
     return { status, message, details: body };
@@ -36,25 +41,28 @@ async function parseError(res: Response): Promise<ApiError> {
   };
 }
 
-export async function apiRequest<TResponse>(
-  path: string,
-  options?: RequestInit
-): Promise<TResponse> {
+export async function apiRequest<TResponse>(path: string, options: RequestInit = {}): Promise<TResponse> {
   const baseUrl = getBaseUrl();
   const token = getToken();
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers = new Headers(options.headers);
 
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+
+  if (!headers.has("Accept")) headers.set("Accept", "application/json");
+  if (token && !headers.has("Authorization")) headers.set("Authorization", `Bearer ${token}`);
+
+  if (!isFormData) {
+    const hasContentType = headers.has("Content-Type");
+    const hasBody = options.body != null;
+    if (hasBody && !hasContentType) headers.set("Content-Type", "application/json");
+  } else {
+    headers.delete("Content-Type");
+  }
 
   const res = await fetch(`${baseUrl}${path}`, {
     ...options,
-    headers: {
-      ...headers,
-      ...(options?.headers ?? {}),
-    },
+    headers,
   });
 
   if (!res.ok) {
@@ -62,5 +70,11 @@ export async function apiRequest<TResponse>(
   }
 
   if (res.status === 204) return undefined as TResponse;
+
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    return (await res.text()) as unknown as TResponse;
+  }
+
   return (await res.json()) as TResponse;
 }
