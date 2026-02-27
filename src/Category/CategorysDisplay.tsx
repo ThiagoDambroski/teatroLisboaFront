@@ -88,7 +88,7 @@ export default function CategorysDisplay() {
         <div className="cats__head">
           <h2 className="cats__title">Explore a nossa variedade de categorias</h2>
           <p className="cats__sub">
-            Seja uma comédia para rir, um drama para pensar, ou um documentário para descobrir algo novo.
+            Seja uma comédia, um drama que convida à reflexão ou um documentário que nos dá a descobrir algo novo.
           </p>
         </div>
 

@@ -13,8 +13,7 @@ function Footer() {
           <div className="footer__brand">
             <h2 className="footer__logo">Cinema Teatral OTL</h2>
             <p className="footer__description">
-              Plataforma digital dedicada à exibição de peças, performances e
-              conteúdos culturais exclusivos.
+              Plataforma digital dedicada ao teatro filmado e ao cinema teatral.
             </p>
           </div>
 

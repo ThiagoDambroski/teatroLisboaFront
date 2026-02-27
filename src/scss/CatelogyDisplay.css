@@ -33,6 +33,7 @@
 }
 
 .catalogyDisplay__titleWrap {
+  text-align: start;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

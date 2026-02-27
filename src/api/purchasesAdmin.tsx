@@ -19,3 +19,7 @@ export async function getAllPurchases(): Promise<PurchaseResponse[]> {
 export async function deletePurchase(id: number): Promise<void> {
   return apiRequest<void>(`/admin/purchases/${id}`, { method: "DELETE" });
 }
+
+export async function getPurchasesByVideo(streamingVideoId: number): Promise<PurchaseResponse[]> {
+  return apiRequest<PurchaseResponse[]>(`/admin/purchases/by-video/${streamingVideoId}`);
+}

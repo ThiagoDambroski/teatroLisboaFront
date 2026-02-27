@@ -10,51 +10,51 @@ type FAQItem = {
 const FAQS: FAQItem[] = [
   {
     id: "01",
-    question: "O que é o Teatro Lisboa?",
+    question: "O que é o Cinema Teatral OTL?",
     answer:
-      "O Teatro Lisboa é uma plataforma de streaming dedicada a espetáculos, peças de teatro, performances e conteúdos culturais, disponíveis para assistir quando e onde quiser.",
+      "O Cinema Teatral OTL é uma plataforma digital criada pela Oficinas Teatro Lisboa que disponibiliza obras teatrais concebidas para o ecrã.\n\nNão se trata de teatro simplesmente filmado, mas de objetos cinematográficos performativos que resultam de um processo artístico que cruza criação teatral e linguagem audiovisual.\n\nO Cinema Teatral prolonga a vida das criações da OTL, tornando-as acessíveis para além do espaço físico e do momento efémero da apresentação.",
   },
   {
     id: "02",
-    question: "Quanto custa o Teatro Lisboa?",
+    question: "Que conteúdos estão disponíveis no Cinema Teatral OTL?",
     answer:
-      "O custo do Teatro Lisboa pode variar consoante o tipo de acesso ou espetáculo. Algumas produções podem ser gratuitas, enquanto outras requerem bilhete ou subscrição.",
+      "A plataforma disponibiliza:\n\n· Criações originais desenvolvidas pela Oficinas Teatro Lisboa\n· Espetáculos adaptados para formato cinematográfico\n· Projetos experimentais híbridos entre teatro e cinema\n· Eventualmente, criações independentes de artistas convidados\n\nCada obra é apresentada como um filme teatral autónomo, com identidade própria.",
   },
   {
     id: "03",
-    question: "Que conteúdos estão disponíveis no Teatro Lisboa?",
+    question: "Como posso criar uma conta no Cinema Teatral OTL?",
     answer:
-      "No Teatro Lisboa pode encontrar peças de teatro, gravações exclusivas, espetáculos contemporâneos, clássicos do repertório e conteúdos especiais produzidos para a plataforma.",
+      "Para criar uma conta basta:\n\n1. Aceder à página oficial do Cinema Teatral OTL\n2. Selecionar a opção “Criar Conta”\n3. Preencher os dados solicitados\n4. Confirmar o registo através do email enviado automaticamente\n5. Após o registo, poderá alugar e assistir aos conteúdos disponíveis.",
   },
   {
     id: "04",
-    question: "Como posso assistir ao Teatro Lisboa?",
+    question: "Como posso contactar o apoio ao cliente do Cinema Teatral OTL?",
     answer:
-      "Pode assistir ao Teatro Lisboa através do seu navegador ou dispositivo compatível, bastando criar uma conta e adquirir o acesso ao conteúdo desejado.",
+      "Pode contactar-nos através de:\n\n· Email oficial indicado na plataforma\n· Formulário de contacto disponível no site\n\nA equipa responde com a maior brevidade possível em dias úteis.",
   },
   {
     id: "05",
-    question: "Como posso criar uma conta no Teatro Lisboa?",
+    question: "Quanto custa uma peça no Cinema Teatral OTL?",
     answer:
-      "Para criar uma conta, clique em ‘Registar’, preencha os seus dados e siga os passos indicados para concluir o registo.",
+      "O modelo do Cinema Teatral OTL baseia-se no aluguer individual por obra.\n\nO valor pode variar consoante a produção, mas situa-se, em regra, entre 9€ e 12€ por peça, garantindo acesso durante um período de 24 horas após a compra.\n\nO objetivo é manter um valor acessível, permitindo a sustentabilidade do projeto e o apoio à criação artística independente.",
   },
   {
     id: "06",
-    question: "O Teatro Lisboa tem período experimental?",
+    question: "Como posso assistir ao Cinema Teatral OTL?",
     answer:
-      "Alguns conteúdos do Teatro Lisboa podem estar disponíveis gratuitamente por tempo limitado. Consulte a plataforma para saber mais sobre campanhas ativas.",
+      "Após criar conta e concluir o aluguer:\n\n· Pode assistir através de computador, tablet ou smartphone\n· É necessária ligação à internet\n· O conteúdo fica disponível durante o período de aluguer indicado\n\nRecomendamos ligação estável e utilização de auscultadores ou sistema de som adequado para melhor experiência.",
   },
   {
     id: "07",
-    question: "Como posso contactar o apoio ao cliente do Teatro Lisboa?",
+    question: "O Cinema Teatral OTL tem período experimental?",
     answer:
-      "Pode contactar o apoio ao cliente através da secção ‘Contacto’ no site ou enviando um email para o endereço indicado na plataforma.",
+      "Atualmente, o Cinema Teatral OTL não dispõe de período experimental gratuito.\n\nO modelo é de aluguer individual por obra, permitindo ao espectador escolher especificamente o conteúdo que deseja assistir, sem necessidade de subscrição mensal.",
   },
   {
     id: "08",
-    question: "Quais são os métodos de pagamento aceites?",
+    question: "Quais os métodos de pagamento aceites?",
     answer:
-      "O Teatro Lisboa aceita diversos métodos de pagamento, incluindo cartões de crédito e outras opções digitais, consoante a disponibilidade.",
+      "Os métodos de pagamento disponíveis incluem:\n\n· Cartão de crédito ou débito\n· Referência Multibanco\n· MB Way\n· Outros métodos digitais indicados na plataforma (conforme integração do sistema de pagamento)\n\nTodos os pagamentos são processados através de plataformas seguras.",
   },
 ];
 
@@ -74,8 +74,8 @@ export default function HomeFQA() {
               Perguntas Frequentes
             </h2>
             <p className="fqa__subtitle">
-              Tem dúvidas? Nós temos respostas. Consulte a nossa secção de FAQ para
-              encontrar respostas às perguntas mais comuns sobre o Teatro Lisboa.
+              {"Tem dúvidas? Nós temos respostas.\nConsulte a nossa secção de FAQ para encontrar respostas às perguntas mais comuns sobre o Cinema Teatral OTL"}
+              
             </p>
           </div>
 
@@ -101,14 +101,12 @@ export default function HomeFQA() {
                 >
                   <span className="fqaItem__index">{item.id}</span>
                   <span className="fqaItem__question">{item.question}</span>
-                  <span className="fqaItem__icon">
-                    {isOpen ? "−" : "+"}
-                  </span>
+                  <span className="fqaItem__icon">{isOpen ? "−" : "+"}</span>
                 </button>
 
                 {isOpen && (
                   <div className="fqaItem__body">
-                    <p>{item.answer}</p>
+                    <p style={{ whiteSpace: "pre-line" }}>{item.answer}</p>
                   </div>
                 )}
               </div>

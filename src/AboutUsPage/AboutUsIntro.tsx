@@ -1,25 +1,29 @@
-
 import "../scss/AboutUsIntro.css";
+import imageUrl from "../assets/about-us.jpeg";
 
-type AboutUsIntroProps = {
-  // optional: pass your own image later
-  imageUrl?: string;
-};
-
-export default function AboutUsIntro({ imageUrl }: AboutUsIntroProps) {
+export default function AboutUsIntro() {
   const src =
     imageUrl ??
     "https://images.unsplash.com/photo-1520975661595-6453be3f7070?auto=format&fit=crop&w=1200&q=70";
 
   return (
     <section className="aboutIntro" aria-label="About us intro">
-      <div className="aboutIntro__frame">
-        <div className="aboutIntro__imgWrap">
-          <img className="aboutIntro__img" src={src} alt="About us" />
-          <div className="aboutIntro__imgOverlay" aria-hidden="true" />
-        </div>
+      <div className="aboutIntro__inner">
+        <div className="aboutIntro__hero">
+          <div className="aboutIntro__imageWrap">
+            <img
+              className="aboutIntro__image"
+              src={src}
+              alt="About us"
+            />
+            <div
+              className="aboutIntro__imageOverlay"
+              aria-hidden="true"
+            />
+          </div>
 
-        <h1 className="aboutIntro__title">about us</h1>
+          <h1 className="aboutIntro__title">about us</h1>
+        </div>
       </div>
     </section>
   );

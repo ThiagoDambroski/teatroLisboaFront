@@ -1,54 +1,169 @@
 .aboutInfo {
-  background: #7e78d9; // same purple
-  color: white;
-  padding: 8rem 2rem;
+  position: relative;
+  color: rgba(255, 255, 255, 0.92);
+  padding: clamp(4rem, 7vw, 7rem) 1.25rem;
   display: flex;
   justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(1200px 700px at 18% 10%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(900px 600px at 85% 25%, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(180deg, #6f69d4 0%, #5f58c7 55%, #4e47b9 100%);
 }
 
 .aboutInfo__inner {
   width: clamp(320px, 92vw, 1200px);
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 6rem;
-}
-
-.aboutInfo__left {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: clamp(2.25rem, 4vw, 3.5rem);
+}
+
+.aboutInfo__header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: end;
+}
+
+.aboutInfo__eyebrow {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
 }
 
 .aboutInfo__title {
-  font-size: clamp(2rem, 3vw, 3rem);
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
+  margin: 0;
+  font-size: clamp(2.2rem, 3.2vw, 3.25rem);
+  font-weight: 520;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
-.aboutInfo__subtitle {
-  font-size: 0.8rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  opacity: 0.8;
+.aboutInfo__lead {
+  text-align: start;
+  margin: 0;
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.84);
 }
 
-.aboutInfo__right {
+.aboutInfo__content {
+  display: grid;
+  grid-template-columns: 1.35fr 0.95fr;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  align-items: start;
+}
+
+.aboutInfo__card {
+  border-radius: 22px;
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.aboutInfo__aside {
+  position: relative;
+}
+
+.aboutInfo__panel {
+  border-radius: 22px;
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.aboutInfo__sectionTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.aboutInfo__prose {
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
-  font-size: 1rem;
-  line-height: 1.7;
-  opacity: 0.9;
+  gap: 1rem;
 }
 
-@media (max-width: 900px) {
-  .aboutInfo__inner {
+.aboutInfo__prose p {
+  text-align: left;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.85;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.aboutInfo__steps {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.aboutInfo__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.aboutInfo__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-top: 0.45rem;
+  background: rgba(255, 255, 255, 0.75);
+  flex: 0 0 auto;
+}
+
+.aboutInfo__stepText {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.aboutInfo__quotes {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.aboutInfo__quote {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 520;
+}
+
+.aboutInfo__quoteDash {
+  margin-right: 0.5rem;
+  opacity: 0.75;
+}
+
+@media (max-width: 980px) {
+  .aboutInfo__header {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    align-items: start;
   }
 
-  .aboutInfo__right {
-    font-size: 0.95rem;
+  .aboutInfo__content {
+    grid-template-columns: 1fr;
   }
 }

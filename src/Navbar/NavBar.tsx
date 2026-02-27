@@ -9,8 +9,8 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "Pecas", href: "#movies" },
+  { label: "Home", href: "#/" },
+  { label: "Peças", href: "#movies" },
   { label: "Sobre Cinema Teatral OTL", href: "#aboutUs" },
 ];
 
@@ -74,7 +74,10 @@ export default function NavBar() {
           onClick={() => navigate("/")}
           style={{ cursor: "pointer" }}
         >
-          Cinema Teatral OTL
+          Cinema Teatral OTL<br/>
+          <span>Plataforma digital de teatro filmado com linguagem cinematográfica</span>
+
+
         </a>
 
         <div className="tl-navbar__pill">

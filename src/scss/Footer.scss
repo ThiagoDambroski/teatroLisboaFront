@@ -1,6 +1,6 @@
 .footer {
   width: 100%;
-  padding: 60px 0 30px;
+  padding: 60px 0 0;
   background: #0f0f10;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.85);
@@ -20,6 +20,7 @@
 }
 
 .footer__logo {
+  text-align: left;
   margin: 0;
   font-size: 22px;
   font-weight: 800;
@@ -27,6 +28,7 @@
 }
 
 .footer__description {
+  text-align: left;
   margin-top: 12px;
   font-size: 13px;
   line-height: 1.6;
@@ -86,14 +88,22 @@
 }
 
 .footer__bottom {
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #7e78d9;
+  color: #ffffff;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
   text-align: center;
+
+  padding: 18px 0;
+  margin-top: 30px;
+
+  width: 100%;
 }
 
-/* ---------- RESPONSIVE ---------- */
+.footer__bottom > * {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
 
 @media (max-width: 980px) {
   .footer__grid {
@@ -108,6 +118,10 @@
   }
 
   .footer__inner {
+    padding: 0 18px;
+  }
+
+  .footer__bottom > * {
     padding: 0 18px;
   }
 }

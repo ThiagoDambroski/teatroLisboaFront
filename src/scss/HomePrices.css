@@ -31,9 +31,9 @@
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: start;
 }
 
 .prices__title {
@@ -48,6 +48,7 @@
   font-size: 13px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.55);
+  text-align: left;
 }
 
 .prices__grid {
@@ -117,7 +118,7 @@
   border: none;
   border-radius: 10px;
   padding: 12px 14px;
-  background: #e50914;
+  background: #b81c17;
   color: #fff;
   font-size: 13px;
   font-weight: 700;

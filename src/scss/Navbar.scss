@@ -56,10 +56,13 @@ body{
 .tl-navbar__brand {
   justify-self: start;
   text-decoration: none;
-  font-size: 14px;
+  text-align: start;
+  font-size: 21px;
   letter-spacing: 0.2px;
   color: rgba(255, 255, 255, 0.9);
-
+  span{
+    font-size: 12px;
+  }
   &:hover {
     color: rgba(255, 255, 255, 1);
   }
@@ -74,7 +77,7 @@ body{
   padding: 10px 14px;
   border-radius: 14px;
 
-  background: rgba(18, 18, 18, 0.78);
+  background: #7e78d9;
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.45),
@@ -90,7 +93,7 @@ body{
   padding: 8px 12px;
   border-radius: 10px;
 
-  color: rgba(255, 255, 255, 0.7);
+  color: white;
   transition: background 160ms ease, color 160ms ease;
 
   &:hover {

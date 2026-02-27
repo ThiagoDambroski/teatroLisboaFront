@@ -126,6 +126,7 @@
 }
 
 .trailerMain__desc {
+  text-align: left;
   margin: 12px 0 0;
   font-size: 13px;
   line-height: 1.6;
@@ -151,7 +152,7 @@
 }
 
 .trailerBtn--primary {
-  background: #e50914;
+  background: rgb(184, 28, 23);
   color: #fff;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
 }

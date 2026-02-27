@@ -47,7 +47,7 @@ export default function HomePrices() {
       <div className="prices__inner">
         <div className="prices__top">
           <div>
-            <h2 className="prices__title">Nossos preços</h2>
+            <h2 className="prices__title">Os nossos preços</h2>
             <p className="prices__sub">
               Os preços abaixo são gerados automaticamente com base nos valores definidos para cada peça.
               Atualmente, há {totalMovies} peças na plataforma.

@@ -22,7 +22,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: start;
   }
 }
 
@@ -38,6 +38,7 @@
   font-size: 13px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.55);
+  text-align: left;
 }
 
 .prices__grid {
@@ -99,7 +100,7 @@
   border-radius: 10px;
   padding: 12px 14px;
 
-  background: #e50914;
+  background: rgb(184, 28, 23);
   color: #fff;
 
   font-size: 13px;

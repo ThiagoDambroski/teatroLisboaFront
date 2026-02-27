@@ -58,9 +58,14 @@ body {
   -ms-grid-column-align: start;
       justify-self: start;
   text-decoration: none;
-  font-size: 14px;
+  text-align: start;
+  font-size: 21px;
   letter-spacing: 0.2px;
   color: rgba(255, 255, 255, 0.9);
+}
+
+.tl-navbar__brand span {
+  font-size: 12px;
 }
 
 .tl-navbar__brand:hover {
@@ -78,7 +83,7 @@ body {
   gap: 10px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: rgba(18, 18, 18, 0.78);
+  background: #7e78d9;
   border: 1px solid rgba(255, 255, 255, 0.06);
   -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -91,7 +96,7 @@ body {
   font-size: 13px;
   padding: 8px 12px;
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.7);
+  color: white;
   -webkit-transition: background 160ms ease, color 160ms ease;
   transition: background 160ms ease, color 160ms ease;
 }

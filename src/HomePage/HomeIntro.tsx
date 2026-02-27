@@ -20,8 +20,7 @@ export default function HomeIntro() {
         className="homeIntro__video"
         src={introVideo}
         autoPlay
-
-        loop
+        muted
         playsInline
         preload="metadata"
       />

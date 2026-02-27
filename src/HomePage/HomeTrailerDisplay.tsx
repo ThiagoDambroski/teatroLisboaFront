@@ -33,11 +33,11 @@ function findMovieById(movies: Movie[], id: string): Movie | undefined {
 }
 
 const MOCK_TRAILERS: TrailerItem[] = [
-  { id: "t-01", movieId: "m-001", youtubeId: "dQw4w9WgXcQ", label: "Trailer Oficial" },
-  { id: "t-02", movieId: "m-004", youtubeId: "ysz5S6PUM-U", label: "Teaser" },
-  { id: "t-03", movieId: "m-016", youtubeId: "M7lc1UVf-VE", label: "Bastidores" },
-  { id: "t-04", movieId: "m-021", youtubeId: "aqz-KE-bpKQ", label: "Clip" },
-  { id: "t-05", movieId: "m-010", youtubeId: "ScMzIvxBSi4", label: "Trailer Curto" },
+  { id: "t-01", movieId: "m-016", youtubeId: "M7lc1UVf-VE", label: "Trailer Oficial" },
+  { id: "t-02", movieId: "m-017", youtubeId: "ysz5S6PUM-U", label: "Teaser" },
+  { id: "t-03", movieId: "m-018", youtubeId: "aqz-KE-bpKQ", label: "Bastidores" },
+  { id: "t-04", movieId: "m-019", youtubeId: "ScMzIvxBSi4", label: "Clip" },
+  { id: "t-05", movieId: "m-020", youtubeId: "dQw4w9WgXcQ", label: "Trailer Curto" },
 ];
 
 export default function HomeTrailerDisplay() {
@@ -46,17 +46,22 @@ export default function HomeTrailerDisplay() {
 
   const allMovies = useMemo(() => categories.flatMap((c) => c.movies), [categories]);
 
-  const [selectedTrailerId, setSelectedTrailerId] = useState<string>(MOCK_TRAILERS[0].id);
+  const initialTrailerId = MOCK_TRAILERS[0]?.id ?? "";
+  const [selectedTrailerId, setSelectedTrailerId] = useState<string>(initialTrailerId);
 
   const selectedTrailer = useMemo(() => {
     return MOCK_TRAILERS.find((t) => t.id === selectedTrailerId) ?? MOCK_TRAILERS[0];
   }, [selectedTrailerId]);
 
   const movie = useMemo(() => {
+    if (!selectedTrailer) return undefined;
     return findMovieById(allMovies, selectedTrailer.movieId);
-  }, [allMovies, selectedTrailer.movieId]);
+  }, [allMovies, selectedTrailer]);
 
-  const embedUrl = useMemo(() => buildYouTubeEmbedUrl(selectedTrailer.youtubeId), [selectedTrailer.youtubeId]);
+  const embedUrl = useMemo(() => {
+    if (!selectedTrailer) return "";
+    return buildYouTubeEmbedUrl(selectedTrailer.youtubeId);
+  }, [selectedTrailer]);
 
   const goToMoviePage = (): void => {
     if (!movie) return;
@@ -85,14 +90,16 @@ export default function HomeTrailerDisplay() {
         <div className="trailerGrid">
           <div className="trailerMain">
             <div className="trailerMain__frame">
-              <iframe
-                className="trailerMain__iframe"
-                src={embedUrl}
-                title={movie ? `Trailer de ${movie.title}` : "Trailer"}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
+              {embedUrl ? (
+                <iframe
+                  className="trailerMain__iframe"
+                  src={embedUrl}
+                  title={movie ? `Trailer de ${movie.title}` : "Trailer"}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              ) : null}
             </div>
 
             <div className="trailerMain__meta">
@@ -144,7 +151,7 @@ export default function HomeTrailerDisplay() {
                     aria-label={`Abrir ${t.label}${m ? `: ${m.title}` : ""}`}
                   >
                     <div className="trailerItem__thumb">
-                      <img src={m?.posterUrl} alt={m?.title ?? ""} loading="lazy" />
+                      {m?.posterUrl ? <img src={m.posterUrl} alt={m.title} loading="lazy" /> : null}
                       <div className="trailerItem__thumbShade" aria-hidden="true" />
                       <div className="trailerItem__play" aria-hidden="true">
                         ▶
@@ -157,7 +164,9 @@ export default function HomeTrailerDisplay() {
                         {m ? <span className="trailerItem__price">{formatEUR(m.price)}</span> : null}
                       </div>
                       <div className="trailerItem__name">{m?.title ?? "Indisponível"}</div>
-                      <div className="trailerItem__small">{m ? `${m.year} · ${m.durationMin} min · ${m.ageRating}` : "—"}</div>
+                      <div className="trailerItem__small">
+                        {m ? `${m.year} · ${m.durationMin} min · ${m.ageRating}` : "—"}
+                      </div>
                     </div>
                   </button>
                 );
