@@ -12,7 +12,7 @@ Please change the parent <Route path="${H}"> to <Route path="${H==="/"?"*":`${H}
 
 Não se trata de teatro simplesmente filmado, mas de objetos cinematográficos performativos que resultam de um processo artístico que cruza criação teatral e linguagem audiovisual.
 
-O Cinema Teatral prolonga a vida das criações da OTL, tornando-as acessíveis para além do espaço físico e do momento efémero da apresentação.`},{id:"02",question:"Que conteúdos estão disponíveis no Cinema Teatral OTL?",answer:`A plataforma disponibiliza:
+O Cinema Teatral prolonga a vida das criações da OTL, tornando-as acessíveis além do espaço físico e do momento efémero da apresentação.`},{id:"02",question:"Que conteúdos estão disponíveis no Cinema Teatral OTL?",answer:`A plataforma disponibiliza:
 
 · Criações originais desenvolvidas pela Oficinas Teatro Lisboa
 · Espetáculos adaptados para formato cinematográfico
