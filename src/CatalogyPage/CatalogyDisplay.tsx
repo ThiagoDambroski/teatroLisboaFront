@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApp, type Category, type Movie } from "../Context/AppProvider";
 import "../scss/CatelogyDisplay.css";
+import background from "../assets/background.jpeg";
 
 type FilterKey = "categories" | "recent" | "featured";
 
@@ -45,7 +46,10 @@ function useCanScroll(ref: React.RefObject<HTMLDivElement | null>) {
 
     const update = () => {
       const max = el.scrollWidth - el.clientWidth;
-      setState({ canLeft: el.scrollLeft > 2, canRight: el.scrollLeft < max - 2 });
+      setState({
+        canLeft: el.scrollLeft > 2,
+        canRight: el.scrollLeft < max - 2,
+      });
     };
 
     update();
@@ -81,17 +85,12 @@ export default function CatalogyDisplay() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
 
-  const allMovies = useMemo<Movie[]>(
-    () => categories.flatMap((c) => c.movies),
-    [categories]
-  );
+  const allMovies = useMemo<Movie[]>(() => categories.flatMap((c) => c.movies), [categories]);
 
-  // ✅ read params on entry (cat + price)
   useEffect(() => {
     const cat = searchParams.get("cat");
     const priceRaw = searchParams.get("price");
 
-    // category
     if (cat && categories.some((c) => c.id === cat)) {
       setSelectedCategoryId(cat);
       setFilter("categories");
@@ -99,7 +98,6 @@ export default function CatalogyDisplay() {
       setSelectedCategoryId(null);
     }
 
-    // price
     if (priceRaw) {
       const parsed = Number(priceRaw);
       if (Number.isFinite(parsed)) {
@@ -118,10 +116,13 @@ export default function CatalogyDisplay() {
 
   const featured = useMemo<Movie[]>(() => {
     const flagged = allMovies.filter((m) => m.isFeatured);
-    if (flagged.length > 0) return [...flagged].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+
+    if (flagged.length > 0) {
+      return [...flagged].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+    }
 
     return [...allMovies]
-      .sort((a, b) => (b.rating - a.rating) || (Date.parse(b.createdAt) - Date.parse(a.createdAt)))
+      .sort((a, b) => b.rating - a.rating || Date.parse(b.createdAt) - Date.parse(a.createdAt))
       .slice(0, 12);
   }, [allMovies]);
 
@@ -130,14 +131,12 @@ export default function CatalogyDisplay() {
     return categories.find((c) => c.id === selectedCategoryId);
   }, [categories, selectedCategoryId]);
 
-  // ✅ category movies + optional price filter
   const categoryMoviesFiltered = useMemo<Movie[]>(() => {
     const base = selectedCategory?.movies ?? [];
     if (selectedPrice == null) return base;
     return base.filter((m) => m.price === selectedPrice);
   }, [selectedCategory, selectedPrice]);
 
-  // ✅ price mode across the whole catalog (when NO category is selected)
   const priceMovies = useMemo<Movie[]>(() => {
     if (selectedPrice == null) return [];
     return allMovies.filter((m) => m.price === selectedPrice);
@@ -165,7 +164,14 @@ export default function CatalogyDisplay() {
   };
 
   return (
-    <section className="catalogyDisplay" id="movies" aria-label="Catálogo">
+    <section
+      className="catalogyDisplay"
+      id="movies"
+      aria-label="Catálogo"
+      style={{
+        backgroundImage: `url(${background})`,
+      }}
+    >
       <div className="catalogyDisplay__inner">
         <div className="catalogyDisplay__panel">
           <div className="catalogyDisplay__top">
@@ -173,14 +179,18 @@ export default function CatalogyDisplay() {
               <span className="catalogyDisplay__badge">Peças</span>
               <h2 className="catalogyDisplay__title">Explorar</h2>
               <p className="catalogyDisplay__sub">
-                Navegue por categorias, descubra os mais recentes e veja os destaques do Cinema Teatral OTL.
+                Navega pelas categorias, descubre os espetaculos mais recentes e vê os destaques da OTL
+                Cinema Teatral
               </p>
             </div>
 
-            {/* ✅ If a category is selected, show category header */}
             {selectedCategoryId && (
               <div className="catalogyDisplay__filters" aria-label="Categoria selecionada">
-                <button type="button" className="catalogyDisplay__filterBtn is-active" onClick={clearCategory}>
+                <button
+                  type="button"
+                  className="catalogyDisplay__filterBtn is-active"
+                  onClick={clearCategory}
+                >
                   ← Voltar
                 </button>
 
@@ -194,7 +204,6 @@ export default function CatalogyDisplay() {
                     : ""}
                 </div>
 
-                {/* optional: if price also selected, allow clearing only price */}
                 {selectedPrice != null && (
                   <button
                     type="button"
@@ -208,14 +217,20 @@ export default function CatalogyDisplay() {
               </div>
             )}
 
-            {/* ✅ If NO category selected and a price is selected, show price header */}
             {!selectedCategoryId && selectedPrice != null && (
               <div className="catalogyDisplay__filters" aria-label="Preço selecionado">
-                <button type="button" className="catalogyDisplay__filterBtn is-active" onClick={clearPrice}>
+                <button
+                  type="button"
+                  className="catalogyDisplay__filterBtn is-active"
+                  onClick={clearPrice}
+                >
                   ← Voltar
                 </button>
 
-                <div className="catalogyDisplay__selectedTitle" title={`Peças de ${formatEUR(selectedPrice)}`}>
+                <div
+                  className="catalogyDisplay__selectedTitle"
+                  title={`Peças de ${formatEUR(selectedPrice)}`}
+                >
                   Peças de {formatEUR(selectedPrice)}
                 </div>
 
@@ -225,7 +240,6 @@ export default function CatalogyDisplay() {
               </div>
             )}
 
-            {/* ✅ Normal filters only when nothing is selected (no category and no price) */}
             {!selectedCategoryId && selectedPrice == null && (
               <div className="catalogyDisplay__filters" role="tablist" aria-label="Filtros do catálogo">
                 <button
@@ -262,7 +276,6 @@ export default function CatalogyDisplay() {
           </div>
 
           <div className="catalogyDisplay__content">
-            {/* ✅ CATEGORY view (with optional price filter) */}
             {selectedCategoryId ? (
               <MoviesRow
                 title={selectedCategory?.name ?? "Categoria"}
@@ -270,17 +283,19 @@ export default function CatalogyDisplay() {
                 onOpenMovie={(id) => navigate(`/movies/${id}`)}
               />
             ) : selectedPrice != null ? (
-              /* ✅ PRICE view */
               <MoviesRow
                 title={`Peças de ${formatEUR(selectedPrice)}`}
                 movies={priceMovies}
                 onOpenMovie={(id) => navigate(`/movies/${id}`)}
               />
             ) : (
-              /* ✅ default filtered views */
               <>
                 {filter === "categories" && (
-                  <CategoriesRow title="Categorias" categories={categories} onSelectCategory={selectCategory} />
+                  <CategoriesRow
+                    title="Categorias"
+                    categories={categories}
+                    onSelectCategory={selectCategory}
+                  />
                 )}
 
                 {filter === "recent" && (
@@ -353,6 +368,7 @@ function CategoriesRow({
       <div className="catalogTrack" ref={trackRef}>
         {categories.map((c) => {
           const tiles = clampMoviesForGrid(c.movies);
+
           return (
             <button
               key={c.id}

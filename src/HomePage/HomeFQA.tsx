@@ -12,7 +12,7 @@ const FAQS: FAQItem[] = [
     id: "01",
     question: "O que é o Cinema Teatral OTL?",
     answer:
-      "O Cinema Teatral OTL é uma plataforma digital criada pela Oficinas Teatro Lisboa que disponibiliza obras teatrais concebidas para o ecrã.\n\nNão se trata de teatro simplesmente filmado, mas de objetos cinematográficos performativos que resultam de um processo artístico que cruza criação teatral e linguagem audiovisual.\n\nO Cinema Teatral prolonga a vida das criações da OTL, tornando-as acessíveis para além do espaço físico e do momento efémero da apresentação.",
+      "O Cinema Teatral OTL é uma plataforma digital criada pela Oficinas Teatro Lisboa que disponibiliza obras teatrais concebidas para o ecrã.\n\nNão se trata de teatro simplesmente filmado, mas de objetos cinematográficos performativos que resultam de um processo artístico que cruza criação teatral e linguagem audiovisual.\n\nO Cinema Teatral prolonga a vida das criações da OTL, tornando-as acessíveis além do espaço físico e do momento efémero da apresentação.",
   },
   {
     id: "02",

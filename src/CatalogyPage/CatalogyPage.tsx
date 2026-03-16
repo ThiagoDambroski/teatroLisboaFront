@@ -22,7 +22,7 @@ export default function CataloyPage() {
 
   return (
     <main>
-       <CatalogyIntro /> 
+       
       <div ref={displayRef}>
         <CatalogyDisplay />
       </div>

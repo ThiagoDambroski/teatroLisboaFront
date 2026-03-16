@@ -1,6 +1,5 @@
-import React from "react";
 import { Link } from "react-router-dom";
-import "../scss/Footer.css";
+import "../scss/Footer.scss";
 
 function Footer() {
   const year = new Date().getFullYear();
@@ -8,55 +7,40 @@ function Footer() {
   return (
     <footer className="footer" aria-label="Rodapé">
       <div className="footer__inner">
-        <div className="footer__grid">
-          {/* Brand */}
-          <div className="footer__brand">
-            <h2 className="footer__logo">Cinema Teatral OTL</h2>
-            <p className="footer__description">
-              Plataforma digital dedicada ao teatro filmado e ao cinema teatral.
-            </p>
-          </div>
+        <nav className="footer__nav">
+          <Link to="/trailers" className="footer__link">Trailers</Link>
+          <Link to="/privacidade" className="footer__link">Política de Privacidade</Link>
 
-          {/* Navegação */}
-          <div className="footer__column">
-            <h3 className="footer__title">Explorar</h3>
-            <ul className="footer__list">
-              <li><Link to="/">Início</Link></li>
-              <li><Link to="/catalogo">Catálogo</Link></li>
-              <li><Link to="/trailers">Trailers</Link></li>
-              <li><Link to="/precos">Preços</Link></li>
-            </ul>
-          </div>
+          <a
+            href="https://instagram.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer__link"
+          >
+            Instagram
+          </a>
 
-          {/* Institucional */}
-          <div className="footer__column">
-            <h3 className="footer__title">Institucional</h3>
-            <ul className="footer__list">
-              <li><Link to="/sobre">Sobre nós</Link></li>
-              <li><Link to="/faq">Perguntas frequentes</Link></li>
-              <li><Link to="/contacto">Contacto</Link></li>
-              <li><Link to="/politica">Política de privacidade</Link></li>
-            </ul>
-          </div>
+          <a
+            href="https://facebook.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer__link"
+          >
+            Facebook
+          </a>
 
-          {/* Contacto */}
-          <div className="footer__column">
-            <h3 className="footer__title">Contacto</h3>
-            <ul className="footer__list footer__list--contact">
-              <li>contacto@teatrolisboa.pt</li>
-              <li>Lisboa, Portugal</li>
-            </ul>
+          <a
+            href="https://youtube.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer__link"
+          >
+            YouTube
+          </a>
+        </nav>
 
-            <div className="footer__social">
-              <a href="#" aria-label="Instagram">Instagram</a>
-              <a href="#" aria-label="Facebook">Facebook</a>
-              <a href="#" aria-label="YouTube">YouTube</a>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer__bottom">
-          <span>© {year} Cinema Teatral OTL. Todos os direitos reservados.</span>
+        <div className="footer__copyright">
+          © {year}  OTL Cinema Teatral. Todos os direitos reservados.
         </div>
       </div>
     </footer>

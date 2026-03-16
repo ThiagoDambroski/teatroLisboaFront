@@ -74,10 +74,7 @@ export default function NavBar() {
           onClick={() => navigate("/")}
           style={{ cursor: "pointer" }}
         >
-          Cinema Teatral OTL<br/>
-          <span>Plataforma digital de teatro filmado com linguagem cinematográfica</span>
-
-
+          OTL Cinema Teatral<br/>
         </a>
 
         <div className="tl-navbar__pill">

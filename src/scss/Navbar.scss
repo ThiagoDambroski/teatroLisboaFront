@@ -1,52 +1,28 @@
-body{
-    background-color: black;
-    color: white;
+body {
+  background: #000;
+  color: #fff;
 }
 
 .tl-navbar {
-  z-index: 9999;
-  position: fixed;
-  top: 0px;
-  right: 0%;
+  position: sticky;
+  top: 0;
+  z-index: 999;
   width: 100%;
-  height: 92px;
-  overflow: hidden;
-  border-radius: 0;
-}
-
-.tl-navbar__bg {
-  position: absolute;
-  inset: 0;
-
-  /* Put your ONE big mock image here */
-  background-image: url("/mockups/teatro-lisboa-hero.jpg");
-  background-size: cover;
-  background-position: center;
-
-  /* Dark + blur like your screenshot */
-  filter: blur(1.5px);
-  transform: scale(1.03);
-
-  /* global dark overlay */
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(80% 140% at 50% 50%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.75)),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.7));
-  }
+  height: 60px;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.58)),
+    rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .tl-navbar__content {
   position: relative;
   z-index: 2;
-
   max-width: 1180px;
   height: 100%;
   margin: 0 auto;
   padding: 0 28px;
-
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -58,14 +34,12 @@ body{
   text-decoration: none;
   text-align: start;
   font-size: 21px;
-  letter-spacing: 0.2px;
-  color: rgba(255, 255, 255, 0.9);
-  span{
-    font-size: 12px;
-  }
-  &:hover {
-    color: rgba(255, 255, 255, 1);
-  }
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.tl-navbar__brand span {
+  font-size: 12px;
 }
 
 .tl-navbar__pill {
@@ -73,38 +47,24 @@ body{
   display: inline-flex;
   align-items: center;
   gap: 10px;
-
-  padding: 10px 14px;
-  border-radius: 14px;
-
-  background: #7e78d9;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 8px;
+  border-radius: 999px;
+ 
 }
 
 .tl-navbar__link {
   text-decoration: none;
   font-size: 13px;
   padding: 8px 12px;
-  border-radius: 10px;
-
-  color: white;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.88);
   transition: background 160ms ease, color 160ms ease;
+}
 
-  &:hover {
-    color: rgba(255, 255, 255, 0.92);
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  &.is-active {
-    color: rgba(255, 255, 255, 0.95);
-    background: rgba(255, 255, 255, 0.09);
-  }
+.tl-navbar__link:hover,
+.tl-navbar__link.is-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .tl-navbar__actions {
@@ -121,19 +81,13 @@ body{
   padding: 6px;
   border-radius: 10px;
   cursor: pointer;
-
   color: rgba(255, 255, 255, 0.85);
   transition: background 160ms ease, color 160ms ease;
+}
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 1);
-  }
-
-  &:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.28);
-    outline-offset: 2px;
-  }
+.tl-navbar__iconBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 1);
 }
 
 .tl-navbar__icon {
@@ -143,16 +97,22 @@ body{
 }
 
 @media (max-width: 780px) {
+  .tl-navbar {
+    height: auto;
+    min-height: 80px;
+  }
+
   .tl-navbar__content {
     grid-template-columns: 1fr auto;
     grid-template-rows: auto auto;
+    padding: 12px 18px;
     height: auto;
-    padding: 14px 18px;
   }
 
   .tl-navbar__pill {
     grid-column: 1 / -1;
     justify-self: center;
+    flex-wrap: wrap;
   }
 
   .tl-navbar__actions {

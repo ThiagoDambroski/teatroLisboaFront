@@ -252,6 +252,7 @@ const MOCK_CATEGORIES: Category[] = [
         isFeatured: true,
         collaboratorsSeed: 20,
       }),
+      
     ],
   },
   {
