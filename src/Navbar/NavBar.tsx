@@ -11,6 +11,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { label: "Home", href: "#/" },
   { label: "Peças", href: "#movies" },
+  { label: "FAQ", href: "#faq" },
   { label: "Sobre Cinema Teatral OTL", href: "#aboutUs" },
 ];
 

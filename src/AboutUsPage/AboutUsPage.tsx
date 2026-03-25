@@ -5,7 +5,7 @@ import AboutUsInfo from './AboutUsInfo'
 function AboutUsPage() {
   return (
     <main>
-        <AboutUsIntro/>
+
         <AboutUsInfo/>
     </main>
   )

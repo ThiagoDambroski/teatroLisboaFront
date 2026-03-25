@@ -1,18 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useApp } from "../Context/AppProvider";
+import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { createUser } from "../api/user";
 import type { ApiError } from "../api/http";
 import { login } from "../api/auth";
 import { useAuth } from "../auth/AuthProvider";
-import { Navigate } from "react-router-dom";
-
-
+import background from "../assets/background.jpeg";
 import "../scss/LoginPage.css";
-
-
-
-
 
 type PageKey = "login" | "create" | "forgot";
 
@@ -38,11 +31,12 @@ function getErrorMessage(err: unknown): string {
 }
 
 function LoginPage() {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, setAccessToken } = useAuth();
 
   if (isAuthenticated) {
     return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
   }
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -106,42 +100,48 @@ function LoginPage() {
   const switchTo = (p: PageKey): void => {
     resetMessages();
     setPage(p);
-
     setPassword("");
     setConfirmPassword("");
     setShowPass(false);
     setShowPass2(false);
   };
-const { setAccessToken } = useAuth();
 
- const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!canLogin) return;
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canLogin) return;
 
-  setBusy(true);
-  setMessage(null);
+    setBusy(true);
+    setMessage(null);
 
-  try {
-    const res = await login({ email: email.trim(), password: password.trim() });
-    setAccessToken(res.accessToken);
+    try {
+      const res = await login({ email: email.trim(), password: password.trim() });
+      setAccessToken(res.accessToken);
 
-    const payload = res.accessToken.split(".")[1];
-    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/").padEnd(payload.length + (4 - (payload.length % 4)) % 4, "=")));
-    const rolesStr = typeof decoded?.roles === "string" ? decoded.roles : "";
-    const roles = rolesStr.trim() ? rolesStr.trim().split(/\s+/) : [];
+      const payload = res.accessToken.split(".")[1];
+      const decoded = JSON.parse(
+        atob(
+          payload
+            .replace(/-/g, "+")
+            .replace(/_/g, "/")
+            .padEnd(payload.length + ((4 - (payload.length % 4)) % 4), "=")
+        )
+      );
+      const rolesStr = typeof decoded?.roles === "string" ? decoded.roles : "";
+      const roles = rolesStr.trim() ? rolesStr.trim().split(/\s+/) : [];
 
-    if (roles.includes("ROLE_ADMIN")) {
-      navigate("/admin", { replace: true });
-      return;
+      if (roles.includes("ROLE_ADMIN")) {
+        navigate("/admin", { replace: true });
+        return;
+      }
+
+      navigate(from, { replace: true });
+    } catch (err) {
+      setMessage(getErrorMessage(err));
+    } finally {
+      setBusy(false);
     }
+  };
 
-    navigate("/dashboard", { replace: true });
-  } catch (err) {
-    setMessage(getErrorMessage(err));
-  } finally {
-    setBusy(false);
-  }
-};
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canCreate) return;
@@ -187,7 +187,11 @@ const { setAccessToken } = useAuth();
   };
 
   return (
-    <main className="auth" aria-label="Autenticação">
+    <main
+      className="auth"
+      aria-label="Autenticação"
+      style={{ backgroundImage: `url(${background})` }}
+    >
       <div className="auth__bg" aria-hidden="true" />
 
       <div className="auth__shell">

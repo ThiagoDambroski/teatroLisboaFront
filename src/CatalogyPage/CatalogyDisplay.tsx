@@ -463,8 +463,7 @@ function MoviesRow({
 
               <div className="posterCard__pills">
                 <span className="posterCard__pill">{formatDuration(m.durationMin)}</span>
-                <span className="posterCard__pill">Classificação {m.ageRating}</span>
-                <span className="posterCard__pill">{audienceFromAgeRating(m.ageRating)}</span>
+               
               </div>
             </div>
           </button>

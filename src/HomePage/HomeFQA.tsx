@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../scss/HomeFQA.css";
+import background from "../assets/background.jpeg";
 
 type FAQItem = {
   id: string;
@@ -59,14 +60,44 @@ const FAQS: FAQItem[] = [
 ];
 
 export default function HomeFQA() {
-  const [openId, setOpenId] = useState<string | null>("01");
+  const [openId, setOpenId] = useState<string | null>(null);
 
-  const toggle = (id: string): void => {
-    setOpenId((prev) => (prev === id ? null : id));
+  const selectedItem = FAQS.find((item) => item.id === openId) ?? null;
+
+  useEffect(() => {
+    if (!selectedItem) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenId(null);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedItem]);
+
+  const openLightbox = (id: string): void => {
+    setOpenId(id);
+  };
+
+  const closeLightbox = (): void => {
+    setOpenId(null);
   };
 
   return (
-    <section className="fqa" aria-labelledby="fqa-title">
+    <section
+      className="fqa"
+      aria-labelledby="fqa-title"
+      style={{ backgroundImage: `url(${background})` }}
+    >
+      <div className="fqa__overlay" />
       <div className="fqa__inner">
         <div className="fqa__header">
           <div>
@@ -74,8 +105,9 @@ export default function HomeFQA() {
               Perguntas Frequentes
             </h2>
             <p className="fqa__subtitle">
-              {"Tem dúvidas? Nós temos respostas.\nConsulte a nossa secção de FAQ para encontrar respostas às perguntas mais comuns sobre o Cinema Teatral OTL"}
-              
+              {
+                "Tem dúvidas? Nós temos respostas.\nConsulte a nossa secção de FAQ para encontrar respostas às perguntas mais comuns sobre o Cinema Teatral OTL"
+              }
             </p>
           </div>
 
@@ -85,35 +117,59 @@ export default function HomeFQA() {
         </div>
 
         <div className="fqa__grid">
-          {FAQS.map((item) => {
-            const isOpen = item.id === openId;
-
-            return (
-              <div
-                key={item.id}
-                className={`fqaItem ${isOpen ? "is-open" : ""}`}
+          {FAQS.map((item) => (
+            <div key={item.id} className="fqaItem">
+              <button
+                type="button"
+                className="fqaItem__header"
+                onClick={() => openLightbox(item.id)}
+                aria-haspopup="dialog"
+                aria-expanded={openId === item.id}
               >
-                <button
-                  type="button"
-                  className="fqaItem__header"
-                  onClick={() => toggle(item.id)}
-                  aria-expanded={isOpen}
-                >
-                  <span className="fqaItem__index">{item.id}</span>
-                  <span className="fqaItem__question">{item.question}</span>
-                  <span className="fqaItem__icon">{isOpen ? "−" : "+"}</span>
-                </button>
-
-                {isOpen && (
-                  <div className="fqaItem__body">
-                    <p style={{ whiteSpace: "pre-line" }}>{item.answer}</p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                <span className="fqaItem__index">{item.id}</span>
+                <span className="fqaItem__question">{item.question}</span>
+                <span className="fqaItem__icon">+</span>
+              </button>
+            </div>
+          ))}
         </div>
       </div>
+
+      {selectedItem && (
+        <div
+          className="fqaLightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="fqa-lightbox-title"
+          onClick={closeLightbox}
+        >
+          <div className="fqaLightbox__backdrop" />
+          <div
+            className="fqaLightbox__panel"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="fqaLightbox__close"
+              onClick={closeLightbox}
+              aria-label="Fechar"
+            >
+              ×
+            </button>
+
+            <div className="fqaLightbox__top">
+              <span className="fqaLightbox__index">{selectedItem.id}</span>
+              <h3 id="fqa-lightbox-title" className="fqaLightbox__title">
+                {selectedItem.question}
+              </h3>
+            </div>
+
+            <div className="fqaLightbox__body">
+              <p style={{ whiteSpace: "pre-line" }}>{selectedItem.answer}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

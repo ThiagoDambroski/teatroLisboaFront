@@ -1,7 +1,7 @@
 .catalogyDisplay {
   width: 100vw;
   height: calc(100vh - 110px);
-  padding: 28px 0 52px;
+  padding: 28px 0 0px;
   color: rgba(255, 255, 255, 0.96);
   display: flex;
   justify-content: center;
@@ -258,8 +258,7 @@
 .catalogTrack--posters {
   gap: 16px;
   align-items: flex-start;
-  overflow-y: visible;
-  padding-bottom: 22px;
+  overflow-y: hidden;
 }
 
 .posterCard {
@@ -277,7 +276,7 @@
 .posterCard__img {
   position: relative;
   width: 100%;
-  height: 220px;
+  height: 170px;
   flex-shrink: 0;
   background: transparent;
 }

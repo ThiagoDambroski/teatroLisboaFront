@@ -14,6 +14,9 @@ import {
 import { getPurchasesByVideo } from "../../api/purchasesAdmin";
 import { getCollaborators, type CollaboratorResponse } from "../../api/collaborators";
 import { uploadImage } from "../../api/uploads";
+import { initUpload } from "../../api/streamingVideos";
+import * as tus from "tus-js-client";
+
 
 function getErrorMessage(err: unknown): string {
   const maybe = err as Partial<ApiError> | null;
@@ -83,6 +86,8 @@ function clampYear(y: number): number {
   return y;
 }
 
+
+
 export default function AdminVideosTab() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,6 +111,8 @@ export default function AdminVideosTab() {
 
   const [priceStr, setPriceStr] = useState("");
   const [yearStr, setYearStr] = useState("");
+  
+  const [videoFile, setVideoFile] = useState<File | null>(null);
 
   const thumbCreateInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -145,7 +152,7 @@ export default function AdminVideosTab() {
   const canCreate = useMemo(() => {
     if (busy) return false;
     if (!name.trim() || name.trim().length > 200) return false;
-    if (!videoUrl.trim() || videoUrl.trim().length > 500) return false;
+    if (!videoFile) return false;
 
     if (!thumbImage.trim() || thumbImage.trim().length > 500) return false;
 
@@ -180,30 +187,70 @@ export default function AdminVideosTab() {
     }
   };
 
+  function uploadVideoToTus(file: File, endpoint: string) {
+    return new Promise<void>((resolve, reject) => {
+      const upload = new tus.Upload(file, {
+        endpoint,
+        retryDelays: [0, 3000, 5000, 10000],
+
+        onError: (error) => {
+          console.error("Upload failed:", error);
+          reject(error);
+        },
+
+        onProgress: (bytesUploaded, bytesTotal) => {
+          const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+          console.log("Progress:", percentage + "%");
+        },
+
+        onSuccess: () => {
+          console.log("Upload finished:", upload.url);
+          resolve();
+        },
+      });
+
+      upload.start();
+    });
+  }
+
+
   const onCreate = async () => {
-    if (!canCreate) return;
+    if (!canCreate || !videoFile) return;
 
     setBusy(true);
     setError(null);
     setOk(null);
 
     try {
-      const payload: StreamingVideoCreateRequest = {
+      const init = await initUpload({
         name: name.trim(),
-        videoUrl: videoUrl.trim(),
-        videoTrailerUrl: trailerUrl.trim() ? trailerUrl.trim() : null,
-        synopsis: synopsis.trim() ? synopsis.trim() : null,
+        videoTrailerUrl: trailerUrl.trim() || null,
         thumbImage: thumbImage.trim(),
+        synopsis: synopsis.trim() || null,
         ageRating,
         price: parsedPrice!,
         year: parsedYear!,
         categoryIds,
         collaboratorIds,
-      };
+        originalFileName: videoFile.name,
+        contentType: videoFile.type || null,
+        fileSize: videoFile.size,
+      });
 
-      await createVideo(payload);
+     
 
-      setOk("Vídeo criado.");
+      console.log("INIT:", init);
+
+      if (!videoFile) return;
+
+      if (init.tusEndpoint !== "mock-endpoint") {
+        await uploadVideoToTus(videoFile, init.tusEndpoint);
+      } else {
+        console.log("Mock upload skipped");
+      }
+
+      setOk("Upload completo.");
+
       setName("");
       setVideoUrl("");
       setTrailerUrl("");
@@ -322,6 +369,16 @@ export default function AdminVideosTab() {
           <label className="dashField">
             <span className="dashField__label">URL do vídeo</span>
             <input className="dashField__input" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} maxLength={500} />
+          </label>
+
+          <label className="dashField">
+            <span className="dashField__label">Ficheiro do vídeo</span>
+            <input
+              className="dashField__input"
+              type="file"
+              accept="video/*"
+              onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
+            />
           </label>
 
           <div className="dashForm__grid2">
@@ -677,7 +734,12 @@ function VideoCard({
 
             <label className="dashField">
               <span className="dashField__label">URL do vídeo</span>
-              <input className="dashField__input" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} maxLength={500} />
+              <input
+                className="dashField__input"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                maxLength={500}
+              />
             </label>
 
             <div className="dashForm__grid2">
@@ -698,7 +760,7 @@ function VideoCard({
                 />
               </label>
             </div>
-
+            
             <label className="dashField">
               <span className="dashField__label">Sinopse (opcional)</span>
               <textarea className="dashField__textarea" value={synopsis} onChange={(e) => setSynopsis(e.target.value)} />

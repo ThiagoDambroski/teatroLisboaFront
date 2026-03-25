@@ -14,6 +14,7 @@ import LoginPage from "./LoginPage/LoginPage";
 import SearchPage from "./SearchPage/SearchPage";
 import DashBoardUser from "./DashbordPage/DashBoardUser";
 import DashBoardAdmin from "./DashbordPage/DashBoardAdmin";
+import FAQ from "./HomePage/HomeFQA"
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route path="/aboutUs" element={<AboutUsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 

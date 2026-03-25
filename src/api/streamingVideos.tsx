@@ -123,3 +123,38 @@ export async function deleteVideo(id: number): Promise<void> {
     method: "DELETE",
   });
 }
+
+export type AdminVideoInitUploadRequest = {
+  name: string;
+  videoTrailerUrl: string | null;
+  thumbImage: string;
+  synopsis: string | null;
+  ageRating: string;
+  price: number;
+  year: number;
+  categoryIds: number[];
+  collaboratorIds: number[];
+
+  originalFileName: string;
+  contentType: string | null;
+  fileSize: number | null;
+};
+
+export type AdminVideoInitUploadResponse = {
+  streamingVideoId: number;
+  providerVideoId: string;
+  uploadStatus: string;
+  tusEndpoint: string;
+  authorizationSignature: string;
+  authorizationExpire: number;
+  libraryId: number;
+};
+
+export async function initUpload(
+  payload: AdminVideoInitUploadRequest
+): Promise<AdminVideoInitUploadResponse> {
+  return apiRequest<AdminVideoInitUploadResponse>("/streaming-videos/init-upload", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
