@@ -2,12 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ApiError } from "../../api/http";
 import { getVideoCategories, type VideoCategoryResponse } from "../../api/videoCategories";
 import {
-  createVideo,
   deleteVideo,
   getAllVideos,
   setVideoRelations,
   updateVideo,
-  type StreamingVideoCreateRequest,
   type StreamingVideoResponse,
   type StreamingVideoUpdateRequest,
 } from "../../api/streamingVideos";
@@ -15,7 +13,7 @@ import { getPurchasesByVideo } from "../../api/purchasesAdmin";
 import { getCollaborators, type CollaboratorResponse } from "../../api/collaborators";
 import { uploadImage } from "../../api/uploads";
 import { initUpload } from "../../api/streamingVideos";
-import * as tus from "tus-js-client";
+
 
 
 function getErrorMessage(err: unknown): string {
@@ -86,7 +84,22 @@ function clampYear(y: number): number {
   return y;
 }
 
+function simulateMockUpload(setUploadProgress: (value: number | null) => void) {
+  return new Promise<void>((resolve) => {
+    let progress = 0;
+    setUploadProgress(0);
 
+    const interval = window.setInterval(() => {
+      progress += 10;
+      setUploadProgress(progress);
+
+      if (progress >= 100) {
+        window.clearInterval(interval);
+        resolve();
+      }
+    }, 250);
+  });
+}
 
 export default function AdminVideosTab() {
   const [busy, setBusy] = useState(false);
@@ -113,6 +126,7 @@ export default function AdminVideosTab() {
   const [yearStr, setYearStr] = useState("");
   
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const thumbCreateInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -150,20 +164,17 @@ export default function AdminVideosTab() {
   }, [yearStr]);
 
   const canCreate = useMemo(() => {
-    if (busy) return false;
-    if (!name.trim() || name.trim().length > 200) return false;
-    if (!videoFile) return false;
+  if (busy) return false;
+  if (!name.trim() || name.trim().length > 200) return false;
+  if (!videoFile) return false;
+  if (!thumbImage.trim() || thumbImage.trim().length > 500) return false;
+  if (trailerUrl.trim().length > 500) return false;
+  if (synopsis.trim().length > 2000) return false;
+  if (parsedPrice == null || parsedPrice <= 0) return false;
+  if (parsedYear == null || parsedYear < 1900) return false;
+  return Boolean(ageRating);
+}, [busy, name, videoFile, trailerUrl, thumbImage, synopsis, ageRating, parsedPrice, parsedYear]);
 
-    if (!thumbImage.trim() || thumbImage.trim().length > 500) return false;
-
-    if (!trailerUrl.trim() || trailerUrl.trim().length > 500) return false;
-    if (synopsis.trim().length > 2000) return false;
-
-    if (parsedPrice == null || parsedPrice <= 0) return false;
-    if (parsedYear == null || parsedYear < 1900) return false;
-
-    return Boolean(ageRating);
-  }, [busy, name, videoUrl, trailerUrl, thumbImage, synopsis, ageRating, parsedPrice, parsedYear]);
 
   const pickCreateThumb = () => {
     thumbCreateInputRef.current?.click();
@@ -187,88 +198,58 @@ export default function AdminVideosTab() {
     }
   };
 
-  function uploadVideoToTus(file: File, endpoint: string) {
-    return new Promise<void>((resolve, reject) => {
-      const upload = new tus.Upload(file, {
-        endpoint,
-        retryDelays: [0, 3000, 5000, 10000],
-
-        onError: (error) => {
-          console.error("Upload failed:", error);
-          reject(error);
-        },
-
-        onProgress: (bytesUploaded, bytesTotal) => {
-          const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-          console.log("Progress:", percentage + "%");
-        },
-
-        onSuccess: () => {
-          console.log("Upload finished:", upload.url);
-          resolve();
-        },
-      });
-
-      upload.start();
-    });
-  }
-
+  
 
   const onCreate = async () => {
-    if (!canCreate || !videoFile) return;
+  if (!canCreate || !videoFile) return;
 
-    setBusy(true);
-    setError(null);
-    setOk(null);
+  setBusy(true);
+  setError(null);
+  setOk(null);
 
-    try {
-      const init = await initUpload({
-        name: name.trim(),
-        videoTrailerUrl: trailerUrl.trim() || null,
-        thumbImage: thumbImage.trim(),
-        synopsis: synopsis.trim() || null,
-        ageRating,
-        price: parsedPrice!,
-        year: parsedYear!,
-        categoryIds,
-        collaboratorIds,
-        originalFileName: videoFile.name,
-        contentType: videoFile.type || null,
-        fileSize: videoFile.size,
-      });
+  try {
+    const init = await initUpload({
+      name: name.trim(),
+      videoTrailerUrl: trailerUrl.trim() || null,
+      thumbImage: thumbImage.trim(),
+      synopsis: synopsis.trim() || null,
+      ageRating,
+      price: parsedPrice!,
+      year: parsedYear!,
+      categoryIds,
+      collaboratorIds,
+      originalFileName: videoFile.name,
+      contentType: videoFile.type || null,
+      fileSize: videoFile.size,
+    });
 
-     
+    console.log("INIT UPLOAD:", init);
 
-      console.log("INIT:", init);
+    await simulateMockUpload(setUploadProgress);
 
-      if (!videoFile) return;
+    setOk("Upload mock concluído.");
 
-      if (init.tusEndpoint !== "mock-endpoint") {
-        await uploadVideoToTus(videoFile, init.tusEndpoint);
-      } else {
-        console.log("Mock upload skipped");
-      }
+    setName("");
+    setVideoUrl("");
+    setTrailerUrl("");
+    setThumbImage("");
+    setSynopsis("");
+    setAgeRating("L");
+    setCategoryIds([]);
+    setCollaboratorIds([]);
+    setPriceStr("");
+    setYearStr("");
+    setVideoFile(null);
+    setUploadProgress(null);
 
-      setOk("Upload completo.");
-
-      setName("");
-      setVideoUrl("");
-      setTrailerUrl("");
-      setThumbImage("");
-      setSynopsis("");
-      setAgeRating("L");
-      setCategoryIds([]);
-      setCollaboratorIds([]);
-      setPriceStr("");
-      setYearStr("");
-
-      await load();
-    } catch (e) {
-      setError(getErrorMessage(e));
-    } finally {
-      setBusy(false);
-    }
-  };
+    await load();
+  } catch (e) {
+    setError(getErrorMessage(e));
+    setUploadProgress(null);
+  } finally {
+    setBusy(false);
+  }
+};
 
   const loadPurchaseStats = async () => {
     setBusy(true);
@@ -305,6 +286,11 @@ export default function AdminVideosTab() {
       {ok ? <div className="dashMsg dashMsg--ok">{ok}</div> : null}
 
       <section className="dash__panel" style={{ marginTop: 12 }}>
+        {uploadProgress !== null ? (
+          <div className="dashMsg" style={{ marginTop: 8 }}>
+            Upload: {uploadProgress}%
+          </div>
+        ) : null}
         <h3 className="dash__panelTitle" style={{ marginTop: 0 }}>
           Criar vídeo
         </h3>
@@ -379,6 +365,11 @@ export default function AdminVideosTab() {
               accept="video/*"
               onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
             />
+            {videoFile ? (
+              <div className="dashField__hint" style={{ marginTop: 6 }}>
+                Ficheiro selecionado: {videoFile.name}
+              </div>
+            ) : null}
           </label>
 
           <div className="dashForm__grid2">
@@ -669,6 +660,10 @@ function VideoCard({
                   </>
                 ) : null}
               </div>
+            </div>
+
+            <div style={{ opacity: 0.75, fontSize: 13, marginTop: 6 }}>
+              provider: <strong>{video.provider ?? "—"}</strong> · status: <strong>{video.uploadStatus ?? "—"}</strong> · publicado: <strong>{video.published ? "sim" : "não"}</strong>
             </div>
 
             <div className="dashActions" style={{ marginTop: 0 }}>

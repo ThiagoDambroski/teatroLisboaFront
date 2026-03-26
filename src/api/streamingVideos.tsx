@@ -19,10 +19,15 @@ export type StreamingVideoResponse = {
   likes: number;
   synopsis: string | null;
   ageRating: AgeRating;
-
-  // ✅ NOVO
-  price: number;   // BigDecimal do backend vira number no JSON
+  price: number;
   year: number;
+
+  provider: string | null;
+  providerVideoId: string | null;
+  playbackUrl: string | null;
+  embedUrl: string | null;
+  uploadStatus: "DRAFT" | "UPLOADING" | "PROCESSING" | "READY" | "FAILED" | null;
+  published: boolean | null;
 
   collaboratorIds: number[];
   categoryIds: number[];
