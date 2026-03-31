@@ -13,7 +13,7 @@ import { getPurchasesByVideo } from "../../api/purchasesAdmin";
 import { getCollaborators, type CollaboratorResponse } from "../../api/collaborators";
 import { uploadImage } from "../../api/uploads";
 import { initUpload } from "../../api/streamingVideos";
-
+import { uploadVideoToBunny } from "../../api/streamingVideos";
 
 
 function getErrorMessage(err: unknown): string {
@@ -223,26 +223,13 @@ export default function AdminVideosTab() {
       fileSize: videoFile.size,
     });
 
-    console.log("INIT UPLOAD:", init);
+    setOk("Upload started...");
 
-    await simulateMockUpload(setUploadProgress);
+    await uploadVideoToBunny(videoFile, init, (progress) => {
+      console.log("UPLOAD:", progress.toFixed(2) + "%");
+    });
 
-    setOk("Upload mock concluído.");
-
-    setName("");
-    setVideoUrl("");
-    setTrailerUrl("");
-    setThumbImage("");
-    setSynopsis("");
-    setAgeRating("L");
-    setCategoryIds([]);
-    setCollaboratorIds([]);
-    setPriceStr("");
-    setYearStr("");
-    setVideoFile(null);
-    setUploadProgress(null);
-
-    await load();
+    setOk("Upload finished. Processing video...");
   } catch (e) {
     setError(getErrorMessage(e));
     setUploadProgress(null);

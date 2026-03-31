@@ -6,6 +6,49 @@ import { apiRequest } from "./http";
  */
 export type AgeRating = "L" | "M3" | "M6" | "M12" | "M14" | "M16" | "M18";
 
+import * as tus from "tus-js-client";
+
+export function uploadVideoToBunny(
+  file: File,
+  init: {
+    providerVideoId: string;
+    libraryId: number;
+    authorizationSignature: string;
+    authorizationExpire: number;
+    tusEndpoint: string;
+  },
+  onProgress?: (progress: number) => void
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const upload = new tus.Upload(file, {
+      endpoint: init.tusEndpoint,
+      retryDelays: [0, 1000, 3000, 5000],
+
+      headers: {
+        AuthorizationSignature: init.authorizationSignature,
+        AuthorizationExpire: init.authorizationExpire.toString(),
+        VideoId: init.providerVideoId,
+        LibraryId: init.libraryId.toString(),
+      },
+
+      metadata: {
+        filename: file.name,
+        filetype: file.type,
+      },
+
+      onError: (error) => reject(error),
+
+      onProgress: (bytesUploaded, bytesTotal) => {
+        const percentage = (bytesUploaded / bytesTotal) * 100;
+        onProgress?.(percentage);
+      },
+
+      onSuccess: () => resolve(),
+    });
+
+    upload.start();
+  });
+}
 /* ============================================================
    RESPONSE TYPE (o que o backend devolve)
 ============================================================ */
