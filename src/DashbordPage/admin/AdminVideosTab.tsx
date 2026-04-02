@@ -14,6 +14,7 @@ import { getCollaborators, type CollaboratorResponse } from "../../api/collabora
 import { uploadImage } from "../../api/uploads";
 import { initUpload } from "../../api/streamingVideos";
 import { uploadVideoToBunny } from "../../api/streamingVideos";
+import * as tus from "tus-js-client";
 
 
 function getErrorMessage(err: unknown): string {
@@ -84,22 +85,7 @@ function clampYear(y: number): number {
   return y;
 }
 
-function simulateMockUpload(setUploadProgress: (value: number | null) => void) {
-  return new Promise<void>((resolve) => {
-    let progress = 0;
-    setUploadProgress(0);
 
-    const interval = window.setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
-
-      if (progress >= 100) {
-        window.clearInterval(interval);
-        resolve();
-      }
-    }, 250);
-  });
-}
 
 export default function AdminVideosTab() {
   const [busy, setBusy] = useState(false);
@@ -126,9 +112,12 @@ export default function AdminVideosTab() {
   const [yearStr, setYearStr] = useState("");
   
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-
+  const [uploadProgress, setUploadProgress] = useState<number | null>(0);
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
   const thumbCreateInputRef = useRef<HTMLInputElement | null>(null);
+
+
+
 
   const load = async () => {
     setBusy(true);
@@ -208,6 +197,9 @@ export default function AdminVideosTab() {
   setOk(null);
 
   try {
+    setUploadStatus("uploading");
+    setUploadProgress(0);
+
     const init = await initUpload({
       name: name.trim(),
       videoTrailerUrl: trailerUrl.trim() || null,
@@ -223,13 +215,40 @@ export default function AdminVideosTab() {
       fileSize: videoFile.size,
     });
 
-    setOk("Upload started...");
+    const upload = new tus.Upload(videoFile, {
+      endpoint: init.tusEndpoint,
+      retryDelays: [0, 1000, 3000, 5000],
 
-    await uploadVideoToBunny(videoFile, init, (progress) => {
-      console.log("UPLOAD:", progress.toFixed(2) + "%");
+      headers: {
+        AuthorizationSignature: init.authorizationSignature,
+        AuthorizationExpire: init.authorizationExpire.toString(),
+        VideoId: init.providerVideoId,
+        LibraryId: init.libraryId.toString(),
+      },
+
+      metadata: {
+        filename: videoFile.name,
+        filetype: videoFile.type,
+      },
+
+      onError: (error) => {
+        console.error("Upload failed:", error);
+        setUploadStatus("error");
+        setError("Erro no upload.");
+      },
+
+      onProgress: (bytesUploaded, bytesTotal) => {
+        const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
+        setUploadProgress(percentage);
+      },
+
+      onSuccess: () => {
+        setUploadStatus("done");
+        setOk("Upload completo.");
+      },
     });
 
-    setOk("Upload finished. Processing video...");
+    upload.start();
   } catch (e) {
     setError(getErrorMessage(e));
     setUploadProgress(null);
@@ -448,9 +467,31 @@ export default function AdminVideosTab() {
           </div>
 
           <div className="dashActions">
-            <button className="dashBtn" type="button" onClick={() => void onCreate()} disabled={!canCreate}>
+            <button className="dashBtn" type="button" onClick={() => void onCreate()} disabled={!canCreate || uploadStatus === "uploading"}>
               {busy ? "A criar..." : "Criar vídeo"}
             </button>
+            {uploadStatus === "uploading" && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 12, marginBottom: 6 }}>
+                  Uploading... {uploadProgress}%
+                </div>
+
+                <div style={{
+                  width: "100%",
+                  height: 8,
+                  background: "rgba(255,255,255,0.1)",
+                  borderRadius: 6,
+                  overflow: "hidden"
+                }}>
+                  <div style={{
+                    width: `${uploadProgress}%`,
+                    height: "100%",
+                    background: "#7e78d9",
+                    transition: "width 0.2s ease"
+                  }} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
