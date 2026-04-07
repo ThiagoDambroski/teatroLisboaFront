@@ -64,6 +64,7 @@ export type StreamingVideoResponse = {
   ageRating: AgeRating;
   price: number;
   year: number;
+  durationMin: number;
 
   provider: string | null;
   providerVideoId: string | null;
