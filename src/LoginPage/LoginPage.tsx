@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useLocation, useNavigate, Navigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { createUser } from "../api/user";
 import type { ApiError } from "../api/http";
 import { login } from "../api/auth";
@@ -32,11 +32,6 @@ function getErrorMessage(err: unknown): string {
 
 function LoginPage() {
   const { isAuthenticated, isAdmin, setAccessToken } = useAuth();
-
-  if (isAuthenticated) {
-    return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
-  }
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -185,6 +180,10 @@ function LoginPage() {
       setBusy(false);
     }
   };
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <main

@@ -15,6 +15,7 @@ import SearchPage from "./SearchPage/SearchPage";
 import DashBoardUser from "./DashbordPage/DashBoardUser";
 import DashBoardAdmin from "./DashbordPage/DashBoardAdmin";
 import FAQ from "./HomePage/HomeFQA"
+import WatchPage from "./MoviePage/WatchPage";
 
 function App() {
   return (
@@ -41,6 +42,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+          path="/watch/:movieId"
+          element={
+            <ProtectedRoute>
+              <WatchPage />
+            </ProtectedRoute>
+          }
+        />
 
           <Route path="/" element={<HomePage />} />
           <Route path="/movies" element={<CataloyPage />} />

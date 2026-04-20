@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useApp, type Movie } from "../Context/AppProvider";
+import { useAuth } from "../auth/AuthProvider";
 import "../scss/MoviePage.css";
 
 function formatDuration(min: number): string {
@@ -22,7 +23,8 @@ function formatEUR(value: number): string {
 function MoviePage() {
   const navigate = useNavigate();
   const { movieId } = useParams<{ movieId: string }>();
-  const { getMovieById, categories, isAuthenticated } = useApp();
+  const { getMovieById, categories } = useApp();
+  const { isAuthenticated } = useAuth();
 
   const movie = useMemo<Movie | undefined>(() => {
     if (!movieId) return undefined;
@@ -48,7 +50,7 @@ function MoviePage() {
     if (!movieId) return;
 
     if (!isAuthenticated) {
-      navigate("/login", { state: { from: `/movies/${movieId}` } });
+      navigate("/login", { state: { from: `/watch/${movieId}` } });
       return;
     }
 
