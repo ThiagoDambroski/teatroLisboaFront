@@ -231,9 +231,10 @@ function AppProvider({ children }: AppProviderProps) {
           getCollaborators(),
         ]);
 
-        const readyVideos = videos.filter(
-          (video) => video.uploadStatus === "READY"
-        );
+        const readyVideos = videos.filter((video) => {
+        if (!video.uploadStatus) return true;
+        return video.uploadStatus === "READY";
+      });
 
         const nextCategories = buildCategories(
           readyVideos,

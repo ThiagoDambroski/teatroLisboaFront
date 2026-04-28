@@ -1,15 +1,19 @@
 .auth {
   position: relative;
-  min-height: 100vh;
+  height: 100%;
   width: 100%;
   color: rgba(255, 255, 255, 0.92);
+
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 32px 20px;
+
+  padding: 12px 16px;
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
   overflow: hidden;
 }
 
@@ -17,8 +21,11 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.72)),
+  background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.34),
+      rgba(0, 0, 0, 0.72)
+    ),
     radial-gradient(900px 420px at 60% 30%, rgba(255, 255, 255, 0.06), transparent 60%),
     radial-gradient(720px 360px at 30% 70%, rgba(120, 90, 180, 0.12), transparent 55%);
 }
@@ -26,17 +33,22 @@
 .auth__shell {
   position: relative;
   z-index: 1;
+
   width: 100%;
-  max-width: 800px;
+  max-width: 720px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+
+  gap: 12px;
+
+  max-height: 100%;
 }
 
 .auth__back {
   align-self: flex-start;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(18, 18, 18, 0.42);
@@ -45,60 +57,60 @@
   backdrop-filter: blur(6px);
 }
 
+/* IMPORTANT FIX HERE */
 .authCard {
   width: 100%;
-  max-width: 720px;
-  padding: 32px;
-  border-radius: 22px;
+  max-width: 620px;
+
+  padding: 20px;
+
+  border-radius: 20px;
   background: rgba(18, 18, 18, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
+
+  /* THIS FIXES CUT CONTENT */
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
 }
 
+/* smaller header */
 .authCard__head {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .authCard__badge {
   width: 100%;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .authCard__title {
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 600;
   margin: 0;
 }
 
 .authCard__sub {
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.72);
-  max-width: 520px;
   margin: 0;
 }
 
-.authCard__msg {
-  margin-top: 18px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  text-align: center;
-}
-
+/* FORM tighter */
 .authForm {
-  margin-top: 20px;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .authForm__links {
@@ -110,7 +122,7 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .authForm__divider span:first-child,
@@ -120,86 +132,73 @@
 }
 
 .authForm__dividerText {
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.64);
 }
 
+/* INPUTS SMALLER */
 .field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .field__label {
-  font-size: 13px;
+  font-size: 12px;
   text-align: center;
 }
 
 .field__row {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
 .field__input {
   flex: 1;
-  min-height: 54px;
-  padding: 0 16px;
-  border-radius: 14px;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
-  font-size: 15px;
-}
-
-.field__input::placeholder {
-  color: rgba(255, 255, 255, 0.42);
-}
-
-.field__input:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.22);
+  font-size: 14px;
 }
 
 .field__iconBtn {
-  height: 54px;
-  padding: 0 18px;
-  border-radius: 14px;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   cursor: pointer;
 }
 
-.field__hint {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.62);
-}
-
+/* BUTTONS SMALLER */
 .primaryBtn {
-  height: 54px;
-  border-radius: 14px;
+  height: 46px;
+  border-radius: 12px;
   background: #e50914;
   border: none;
   color: white;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
 }
 
 .primaryBtn:disabled {
-  cursor: not-allowed;
-  background-color: grey;
+  background: grey;
 }
 
 .ghostBtn {
-  height: 54px;
-  border-radius: 14px;
+  height: 46px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -208,36 +207,5 @@
   background: transparent;
   color: rgba(255, 255, 255, 0.78);
   cursor: pointer;
-  padding: 0;
-  font-size: 13px;
-}
-
-@media (max-width: 600px) {
-  .auth {
-    padding: 18px 16px;
-  }
-
-  .authCard {
-    padding: 24px;
-  }
-
-  .authCard__title {
-    font-size: 28px;
-  }
-
-  .field__input,
-  .field__iconBtn,
-  .primaryBtn,
-  .ghostBtn {
-    height: 48px;
-  }
-
-  .field__row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .field__iconBtn {
-    width: 100%;
-  }
+  font-size: 12px;
 }

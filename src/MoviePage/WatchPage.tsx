@@ -10,12 +10,19 @@ function WatchPage() {
   const movie = movieId ? getMovieById(movieId) : undefined;
 
   useEffect(() => {
+    if (!movieId) {
+      navigate("/");
+      return;
+    }
+
     if (!movie) {
       navigate("/");
     }
-  }, [movie, navigate]);
+  }, [movie, movieId, navigate]);
 
-  if (!movie) return null;
+  if (!movie) {
+    return null;
+  }
 
   if (movie.uploadStatus !== "READY") {
     return (
@@ -25,7 +32,7 @@ function WatchPage() {
     );
   }
 
-  if (!movie.embedUrl) {
+  if (!movie.embedUrl && !movie.playbackUrl) {
     return (
       <div style={{ padding: "40px", color: "white", background: "black", height: "100vh" }}>
         Video not available
@@ -36,7 +43,7 @@ function WatchPage() {
   return (
     <div style={{ width: "100%", height: "100vh", background: "black" }}>
       <iframe
-        src={movie.embedUrl ?? undefined}
+        src={movie.embedUrl ?? movie.playbackUrl ?? ""}
         style={{
           width: "100%",
           height: "100%",

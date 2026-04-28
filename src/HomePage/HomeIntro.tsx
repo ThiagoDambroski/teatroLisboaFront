@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useApp, type Movie } from "../Context/AppProvider";
+import { useNavigate } from "react-router-dom";
 import "../scss/HomeIntro.scss";
 import introImg from "../assets/background main.jpeg";
 import logoImg from "../assets/logo-file.png";
@@ -28,6 +29,7 @@ function formatDuration(durationMin: number): string {
 
 export default function HomeIntro() {
   const { categories } = useApp();
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   const featuredMovies = useMemo<Movie[]>(() => {
@@ -41,19 +43,23 @@ export default function HomeIntro() {
       ? featuredMovies
       : categories.flatMap((category) => category.movies);
 
-  const maxIndex = Math.max(0, movies.length);
+  // IMPORTANT FIX HERE
+  const visibleCards = 2; // change to 3 if your screen shows 3 cards
+  const maxIndex = Math.max(0, movies.length - visibleCards);
 
   const handlePrev = (): void => {
+    if (movies.length === 0) return;
+
     setCurrentIndex((prev) => {
-      if (movies.length === 0) return 0;
-      return prev === 0 ? maxIndex : prev - 1;
+      return prev <= 0 ? 0 : prev - 1;
     });
   };
 
   const handleNext = (): void => {
+    if (movies.length === 0) return;
+
     setCurrentIndex((prev) => {
-      if (movies.length === 0) return 0;
-      return prev === maxIndex ? 0 : prev + 1;
+      return prev >= maxIndex ? maxIndex : prev + 1;
     });
   };
 
@@ -117,7 +123,12 @@ export default function HomeIntro() {
                 )?.name;
 
                 return (
-                  <article className="homeIntro__card" key={movie.id}>
+                  <article
+                    className="homeIntro__card"
+                    key={movie.id}
+                    onClick={() => navigate(`/movies/${movie.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
                     <div className="homeIntro__cardPosterWrap">
                       <img
                         className="homeIntro__cardPoster"

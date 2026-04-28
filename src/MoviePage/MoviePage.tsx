@@ -24,7 +24,7 @@ function MoviePage() {
   const navigate = useNavigate();
   const { movieId } = useParams<{ movieId: string }>();
   const { getMovieById, categories } = useApp();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, token } = useAuth();
 
   const movie = useMemo<Movie | undefined>(() => {
     if (!movieId) return undefined;
@@ -55,6 +55,27 @@ function MoviePage() {
     }
 
     navigate(`/watch/${movieId}`);
+  };
+
+  const handleBuy = async () => {
+    if (!movie || !token) return;
+
+    try {
+      await fetch("http://localhost:8080/purchases", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          streamingVideoId: Number(movie?.id),
+        }),
+      });
+
+      alert("Purchase successful");
+    } catch {
+      alert("Purchase failed");
+    }
   };
 
   if (!movie) {
@@ -98,6 +119,10 @@ function MoviePage() {
                 Ver agora
               </button>
 
+              <button type="button" className="movieHero__ghost" onClick={handleBuy}>
+                Comprar
+              </button>
+
               <button type="button" className="movieHero__ghost" onClick={goBack}>
                 Voltar
               </button>
@@ -105,68 +130,13 @@ function MoviePage() {
           </div>
         </section>
 
-        <section className="movieLayout" aria-label="Detalhes da peça">
+        <section className="movieLayout">
           <div className="movieLayout__main">
             <div className="movieBlock">
-              <div className="movieBlock__head">
-                <h2 className="movieBlock__title">Descrição</h2>
-              </div>
-              <div className="movieBlock__body">
-                <p className="movieBlock__text">{movie.description}</p>
-              </div>
-            </div>
-
-            <div className="movieBlock">
-              <div className="movieBlock__head">
-                <h2 className="movieBlock__title">Elenco & Equipa</h2>
-              </div>
-
-              <div className="movieBlock__body">
-                <div className="castRow" aria-label="Colaboradores">
-                  {movie.collaborators.map((p) => (
-                    <a
-                      key={p.id}
-                      className="castCard"
-                      href={p.socialUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`${p.name} - ${p.functionOnMovie}`}
-                      title={`${p.name} — ${p.functionOnMovie}`}
-                    >
-                      <img className="castCard__img" src={p.photoUrl} alt={p.name} />
-                      <div className="castCard__meta">
-                        <div className="castCard__name">{p.name}</div>
-                        <div className="castCard__role">{p.functionOnMovie}</div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
+              <h2>Descrição</h2>
+              <p>{movie.description}</p>
             </div>
           </div>
-
-          <aside className="movieLayout__aside" aria-label="Informações">
-            <div className="asideCard">
-              <h3 className="asideCard__title">Informações</h3>
-
-              <div className="asideCard__item">
-                <div className="asideCard__label">Ano</div>
-                <div className="asideCard__value">{movie.year}</div>
-              </div>
-
-              <div className="asideCard__item">
-                <div className="asideCard__label">Categoria</div>
-                <div className="asideCard__value">
-                  {categoryNames.length ? categoryNames.join(", ") : "—"}
-                </div>
-              </div>
-
-              <div className="asideCard__item">
-                <div className="asideCard__label">Preço</div>
-                <div className="asideCard__value asideCard__value--price">{formatEUR(movie.price)}</div>
-              </div>
-            </div>
-          </aside>
         </section>
       </div>
     </main>

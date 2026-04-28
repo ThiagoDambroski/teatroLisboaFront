@@ -14,54 +14,60 @@ import LoginPage from "./LoginPage/LoginPage";
 import SearchPage from "./SearchPage/SearchPage";
 import DashBoardUser from "./DashbordPage/DashBoardUser";
 import DashBoardAdmin from "./DashbordPage/DashBoardAdmin";
-import FAQ from "./HomePage/HomeFQA"
+import FAQ from "./HomePage/HomeFQA";
 import WatchPage from "./MoviePage/WatchPage";
 
 function App() {
   return (
     <AuthProvider>
       <AppProvider>
-        <NavBar />
-        <ScrollToTop />
+        <div className="appLayout">
+          <NavBar />
 
-        <Routes>
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashBoardUser />
-              </ProtectedRoute>
-            }
-          />
+          <div className="appContent">
+            <ScrollToTop />
 
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRoles={["ROLE_ADMIN"]}>
-                <DashBoardAdmin />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-          path="/watch/:movieId"
-          element={
-            <ProtectedRoute>
-              <WatchPage />
-            </ProtectedRoute>
-          }
-        />
+            <Routes>
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashBoardUser />
+                  </ProtectedRoute>
+                }
+              />
 
-          <Route path="/" element={<HomePage />} />
-          <Route path="/movies" element={<CataloyPage />} />
-          <Route path="/movies/:movieId" element={<MoviePage />} />
-          <Route path="/aboutUs" element={<AboutUsPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute requiredRoles={["ROLE_ADMIN"]}>
+                    <DashBoardAdmin />
+                  </ProtectedRoute>
+                }
+              />
 
-        <Footer />
+              <Route
+                path="/watch/:movieId"
+                element={
+                  <ProtectedRoute>
+                    <WatchPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route path="/" element={<HomePage />} />
+              <Route path="/movies" element={<CataloyPage />} />
+              <Route path="/movies/:movieId" element={<MoviePage />} />
+              <Route path="/aboutUs" element={<AboutUsPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+
+          <Footer />
+        </div>
       </AppProvider>
     </AuthProvider>
   );

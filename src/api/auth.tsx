@@ -9,9 +9,9 @@ export type LoginResponse = {
   accessToken: string;
 };
 
-export async function login(payload: LoginRequest): Promise<LoginResponse> {
+export async function login(data: LoginRequest): Promise<LoginResponse> {
   return apiRequest<LoginResponse>("/auth/login", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify(data),
   });
 }

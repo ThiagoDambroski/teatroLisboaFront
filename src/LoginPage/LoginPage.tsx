@@ -55,6 +55,8 @@ function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  const [justCreated, setJustCreated] = useState(false);
+
   const canLogin = useMemo(() => {
     return isEmail(email) && password.trim().length >= 6 && !busy;
   }, [email, password, busy]);
@@ -151,13 +153,17 @@ function LoginPage() {
 
     setBusy(true);
     setMessage(null);
+    
 
     try {
       await createUser(payload);
-      setMessage("Conta criada com sucesso. Pode entrar agora.");
+      setMessage(
+        "Conta criada com sucesso. Verifique o seu email para ativar a conta (verifique também a pasta de spam)."
+      );
       setPage("login");
       setConfirmPassword("");
       setPassword("");
+      setJustCreated(true);
     } catch (err) {
       setMessage(getErrorMessage(err));
     } finally {
@@ -229,7 +235,21 @@ function LoginPage() {
             )}
           </header>
 
-          {message ? <div className="authCard__msg">{message}</div> : null}
+          {message && (
+            <div className="authCard__msg">
+              {message}
+
+              {message.includes("Verifique o seu email") && (
+                <div style={{ marginTop: "10px", fontSize: "0.9rem", opacity: 0.8 }}>
+                  Se não encontrar o email:
+                  <br />
+                  • Verifique a pasta de spam  
+                  <br />
+                  • Aguarde alguns minutos  
+                </div>
+              )}
+            </div>
+          )}
 
           {page === "login" ? (
             <form className="authForm" onSubmit={handleLogin}>
@@ -283,7 +303,7 @@ function LoginPage() {
                 </button>
               </div>
 
-              <button type="submit" className="primaryBtn" disabled={!canLogin}>
+              <button type="submit" className="primaryBtn" disabled={!canLogin || justCreated}>
                 {busy ? "A entrar..." : "Entrar"}
               </button>
 

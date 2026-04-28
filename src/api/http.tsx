@@ -1,81 +1,69 @@
 import { getToken } from "../auth/tokenStorage";
 
+const BASE_URL = "http://localhost:8080";
+
 export type ApiError = {
-  status: number;
   message: string;
-  details?: unknown;
 };
 
-const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
-
-function getBaseUrl(): string {
-  const url = import.meta.env.VITE_API_BASE_URL as string | undefined;
-  if (!url) throw new Error("Missing VITE_API_BASE_URL");
-  return url.replace(/\/+$/, "");
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-async function parseError(res: Response): Promise<ApiError> {
-  const contentType = res.headers.get("content-type") ?? "";
-  const status = res.status;
-
-  if (contentType.includes("application/json")) {
-    const body = (await res.json().catch(() => null)) as unknown;
-
-    const message =
-      (isRecord(body) && typeof body.message === "string" && body.message) ||
-      (isRecord(body) && typeof body.error === "string" && body.error) ||
-      DEFAULT_ERROR_MESSAGE;
-
-    return { status, message, details: body };
-  }
-
-  const text = await res.text().catch(() => "");
-  return {
-    status,
-    message: text.trim() || DEFAULT_ERROR_MESSAGE,
-    details: text || undefined,
-  };
-}
-
-export async function apiRequest<T>(
-  path: string,
+export async function apiRequest<T = any>(
+  url: string,
   options: RequestInit = {}
 ): Promise<T> {
   const token = getToken();
 
-  const headers = new Headers(options.headers || {});
-
-  const isFormData = options.body instanceof FormData;
-
-  if (!isFormData && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
-  }
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string> || {}),
+  };
 
   if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${getBaseUrl()}${path}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(BASE_URL + url, {
+      ...options,
+      headers,
+    });
 
-  if (!res.ok) {
-    throw await parseError(res);
+    if (response.status === 401) {
+      const errorText = await safeReadText(response);
+      throw {
+        message: errorText || "Unauthorized",
+      } as ApiError;
+    }
+
+    if (!response.ok) {
+      const errorText = await safeReadText(response);
+      throw {
+        message: errorText || "Request failed",
+      } as ApiError;
+    }
+
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    console.error("API ERROR:", error);
+
+    if (typeof error === "object" && error !== null && "message" in error) {
+      throw error;
+    }
+
+    throw {
+      message: "Network error. Server may be down.",
+    } as ApiError;
   }
+}
 
-  if (res.status === 204) {
-    return undefined as T;
+async function safeReadText(response: Response): Promise<string | null> {
+  try {
+    const text = await response.text();
+    return text || null;
+  } catch {
+    return null;
   }
-
-  const contentType = res.headers.get("content-type") ?? "";
-  if (!contentType.includes("application/json")) {
-    return undefined as T;
-  }
-
-  return (await res.json()) as T;
 }
